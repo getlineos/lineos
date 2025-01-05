@@ -8,7 +8,7 @@ type TodoT = {
 };
 
 export default function TodoWidget() {
-	const [todos, setTodos] = useState<TodoT[]>([]);
+	const [todos] = useState<TodoT[]>([]);
 
 	return (
 		<div className="bg-white w-[400px] rounded-xl min-h-10 m-5 px-2.5 py-2 relative">
