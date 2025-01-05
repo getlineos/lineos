@@ -11,7 +11,7 @@ export default function TodoWidget() {
 	const [todos] = useState<TodoT[]>([]);
 
 	return (
-		<div className="bg-white w-[400px] rounded-xl min-h-10 m-5 px-2.5 py-2 relative">
+		<div className="bg-white w-[400px] rounded-xl min-h-10 px-2.5 py-2 relative">
 			<h2 className="font-semibold text-sm">Today</h2>
 			<div>
 				{todos?.length ? (

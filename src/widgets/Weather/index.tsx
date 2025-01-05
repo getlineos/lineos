@@ -1,6 +1,6 @@
 export default function WeatherWidget() {
 	return (
-		<div className="mx-5 flex flex-col justify-between rounded-xl p-4 bg-gradient-to-b text-white cursor-pointer transform transition-transform duration-300 ease-in-out active:scale-105 focus:scale-105 hover:scale-105 select-none from-gray-900 to-gray-600 w-[400px]">
+		<div className="flex flex-col justify-between rounded-xl p-4 bg-gradient-to-b text-white cursor-pointer transform transition-transform duration-300 ease-in-out active:scale-105 focus:scale-105 hover:scale-105 select-none from-gray-900 to-gray-600 w-[400px]">
 			<div className="flex justify-between items-center">
 				<div>
 					<p className="m-0">Houston</p>
