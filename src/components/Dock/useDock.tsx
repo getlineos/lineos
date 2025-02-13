@@ -1,11 +1,9 @@
 import { MutableRefObject, useRef } from "react";
-import { useNavigate } from "react-router";
 import { apps } from "../../config/apps";
 
 export default function useDock() {
 	const wrapperRef =
 		useRef<HTMLDivElement>() as MutableRefObject<HTMLDivElement>;
-	const navigate = useNavigate();
 
 	const dockApps = apps.filter((app) => app.showInDock);
 
