@@ -1,6 +1,8 @@
+import { useNavigate } from "react-router";
 import useDock from "./useDock";
 
 export default function Dock() {
+	const navigate = useNavigate();
 	const { apps, wrapperRef, onItemsMouseEnter, onItemsMouseLeave } = useDock();
 
 	return (
@@ -15,7 +17,7 @@ export default function Dock() {
 					style={{ transition: "all ease .2s" }}
 					onMouseEnter={() => onItemsMouseEnter(idx)}
 					onMouseLeave={() => onItemsMouseLeave(idx)}
-					onClick={onClick}
+					onClick={() => onClick?.(navigate)}
 				>
 					<img src={icon} className="select-none w-full" />
 				</div>
