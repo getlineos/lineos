@@ -40,6 +40,7 @@ import SiriIcon from "../assets/img/icons/siri.png";
 import StocksIcon from "../assets/img/icons/stocks.png";
 import XcodeIcon from "../assets/img/icons/xcode.png";
 import TrashIcon from "../assets/img/icons/trash.png";
+import TimeflowIcon from "../assets/img/icons/timeflow.png";
 import { useNavigate } from "react-router";
 
 export interface AppConfig {
@@ -102,6 +103,13 @@ export const apps: AppConfig[] = [
 		icon: FaceTimeIcon,
 		showInDock: true,
 		showInLaunchpad: true,
+	},
+	{
+		name: "Timeflow",
+		icon: TimeflowIcon,
+		showInDock: true,
+		showInLaunchpad: true,
+		onClick: (navigate) => navigate("/apps/timeflow"),
 	},
 	{
 		name: "Music",

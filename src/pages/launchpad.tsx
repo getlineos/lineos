@@ -48,6 +48,10 @@ export default function Launchpad() {
 							<div
 								key={app.name}
 								className="flex flex-col items-center gap-1 sm:gap-2 cursor-default"
+								onClick={(e) => {
+									e.stopPropagation();
+									app.onClick?.(navigate);
+								}}
 							>
 								<img
 									src={app.icon}

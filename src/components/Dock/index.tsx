@@ -7,21 +7,29 @@ export default function Dock() {
 
 	return (
 		<div
-			ref={wrapperRef}
-			className="flex h-[70px] flex-row justify-center items-end bg-white fixed bottom-2 left-0 right-0 px-2 bg-opacity-10 w-max m-auto rounded-[18px]"
+			className="fixed bottom-2 left-0 right-0"
+			onClick={() => navigate("/")}
 		>
-			{apps.map(({ name, icon, onClick }, idx) => (
-				<div
-					key={name}
-					className="w-[60px] align-bottom dock-item flex flex-col items-center mb-[3px]"
-					style={{ transition: "all ease .2s" }}
-					onMouseEnter={() => onItemsMouseEnter(idx)}
-					onMouseLeave={() => onItemsMouseLeave(idx)}
-					onClick={() => onClick?.(navigate)}
-				>
-					<img src={icon} className="select-none w-full" />
-				</div>
-			))}
+			<div
+				ref={wrapperRef}
+				className="flex h-[70px] flex-row justify-center items-end bg-white px-2 bg-opacity-10 w-max m-auto rounded-[18px]"
+			>
+				{apps.map(({ name, icon, onClick }, idx) => (
+					<div
+						key={name}
+						className="w-[60px] align-bottom dock-item flex flex-col items-center mb-[3px]"
+						style={{ transition: "all ease .2s" }}
+						onMouseEnter={() => onItemsMouseEnter(idx)}
+						onMouseLeave={() => onItemsMouseLeave(idx)}
+						onClick={(e) => {
+							e.stopPropagation();
+							onClick?.(navigate);
+						}}
+					>
+						<img src={icon} className="select-none w-full" />
+					</div>
+				))}
+			</div>
 		</div>
 	);
 }

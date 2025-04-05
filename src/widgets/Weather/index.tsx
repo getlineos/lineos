@@ -1,78 +1,42 @@
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
-
-interface WeatherData {
-	name: string;
-	main: {
-		temp: number;
-		temp_max: number;
-		temp_min: number;
-	};
-	weather: {
-		description: string;
-		icon: string;
-	}[];
-}
-
-interface HourlyForecast {
-	dt: number;
-	main: {
-		temp: number;
-	};
-	weather: {
-		icon: string;
-	}[];
-}
+import {
+	useGetCurrentWeatherQuery,
+	useGetHourlyForecastQuery,
+} from "../../store/weatherApi";
 
 export default function WeatherWidget() {
-	const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
-	const [hourlyForecast, setHourlyForecast] = useState<HourlyForecast[]>([]);
+	const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(
+		null
+	);
 	const [error, setError] = useState<string | null>(null);
-	const [loading, setLoading] = useState(true);
+
+	const { data: weatherData, isLoading: isWeatherLoading } =
+		useGetCurrentWeatherQuery(coords!, { skip: !coords });
+
+	const { data: forecastData, isLoading: isForecastLoading } =
+		useGetHourlyForecastQuery(coords!, { skip: !coords });
 
 	useEffect(() => {
-		const fetchWeather = async (lat: number, lon: number) => {
-			try {
-				const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
-				const currentWeatherResponse = await fetch(
-					`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
-				);
-				const currentWeatherData = await currentWeatherResponse.json();
-				setWeatherData(currentWeatherData);
-
-				const forecastResponse = await fetch(
-					`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
-				);
-				const forecastData = await forecastResponse.json();
-
-				const next6Hours = forecastData.list.slice(0, 6);
-				setHourlyForecast(next6Hours);
-
-				setError(null);
-			} catch (err) {
-				setError("Failed to fetch weather data");
-				console.error(err);
-			} finally {
-				setLoading(false);
-			}
-		};
-
 		if (navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition(
 				(position) => {
-					fetchWeather(position.coords.latitude, position.coords.longitude);
+					setCoords({
+						lat: position.coords.latitude,
+						lon: position.coords.longitude,
+					});
 				},
 				(error) => {
 					setError("Please enable location access to get weather data");
-					setLoading(false);
 					console.error(error);
 				}
 			);
 		} else {
 			setError("Geolocation is not supported by your browser");
-			setLoading(false);
 		}
 	}, []);
+
+	const loading = isWeatherLoading || isForecastLoading;
 
 	if (loading) {
 		return (
@@ -93,6 +57,8 @@ export default function WeatherWidget() {
 			</div>
 		);
 	}
+
+	const next6Hours = forecastData?.list.slice(0, 6) || [];
 
 	return (
 		<div className="flex flex-col justify-between rounded-xl p-4 bg-gradient-to-b text-white cursor-pointer transform transition-transform duration-300 ease-in-out active:scale-105 focus:scale-105 hover:scale-105 select-none from-gray-900 to-gray-600 w-[400px]">
@@ -119,7 +85,7 @@ export default function WeatherWidget() {
 				</div>
 			</div>
 			<div className="flex justify-between w-full mt-2 md:mt-6">
-				{hourlyForecast.map((hour, index) => {
+				{next6Hours.map((hour, index) => {
 					const time = dayjs(hour.dt * 1000).format("hA");
 
 					return (
