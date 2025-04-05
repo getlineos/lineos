@@ -10,7 +10,7 @@ export default function App() {
 			<Routes>
 				<Route path="/" element={<Home />} />
 				<Route path="/launchpad" element={<Launchpad />} />
-				<Route path="/" element={<App />} />
+				<Route path="/apps"></Route>
 			</Routes>
 			<Dock />
 		</div>
