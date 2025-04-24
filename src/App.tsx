@@ -3,7 +3,7 @@ import "./assets/css/index.scss";
 import Home from "pages/home";
 import Launchpad from "pages/launchpad";
 import Dock from "components/Dock";
-import TimeFlow from "apps/timeflow";
+import Loop from "apps/loop";
 import AppWrapper from "apps/AppWrapper";
 import { Provider } from "react-redux";
 import { store } from "./store";
@@ -20,7 +20,7 @@ export default function App() {
 					<Route path="/" element={<Home />} />
 					<Route path="/launchpad" element={<Launchpad />} />
 					<Route path="/apps" element={<AppWrapper />}>
-						<Route path="timeflow" element={<TimeFlow />} />
+						<Route path="loop" element={<Loop />} />
 					</Route>
 				</Routes>
 				<Dock />
