@@ -1,12 +1,12 @@
-import { Modal, Button, Popconfirm } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { Habit } from "../../types";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { Button, Modal, Popconfirm } from "antd";
 import { useState } from "react";
-import NewHabitModal from "./NewHabitModal";
 import { useLoop } from "../../context/LoopContext";
+import { HabitT } from "../../types";
+import NewHabitModal from "./NewHabitModal";
 
 interface HabitModalProps {
-	habit: Habit;
+	habit: HabitT;
 	timeBlockName: string;
 	open: boolean;
 	onClose: () => void;

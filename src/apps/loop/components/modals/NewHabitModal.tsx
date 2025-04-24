@@ -6,12 +6,12 @@ import {
 	UNIT_OPTIONS,
 } from "../../constants";
 import { useLoop } from "../../context/LoopContext";
-import { Habit } from "../../types";
+import { HabitT } from "../../types";
 
 interface NewHabitModalProps {
 	open: boolean;
 	onClose: () => void;
-	editHabit?: Habit;
+	editHabit?: HabitT;
 }
 
 export default function NewHabitModal({

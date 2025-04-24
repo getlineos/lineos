@@ -1,9 +1,9 @@
-import { useState } from "react";
 import dayjs from "dayjs";
+import { useState } from "react";
 import Analytics from "./components/Analytics";
 import Calendar from "./components/Calendar";
+import HabitList from "./components/HabitList";
 import Header from "./components/Header";
-import TodoList from "./components/HabitList";
 import { LoopProvider } from "./context/LoopContext";
 
 export default function Loop() {
@@ -17,7 +17,7 @@ export default function Loop() {
 
 					<div className="grid grid-cols-12 gap-6">
 						<div className="col-span-8">
-							<TodoList currentDate={currentDate} />
+							<HabitList currentDate={currentDate} />
 						</div>
 
 						<div className="col-span-4 space-y-6">

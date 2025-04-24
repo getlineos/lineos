@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import dayjs from "dayjs";
-import { getHabits, getStoredData } from "../utils/storage";
 import { HabitT, TimerData } from "../types";
+import { getHabits, getStoredData } from "../utils/storage";
 
 interface AnalyticsProps {
 	currentDate: string;

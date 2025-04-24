@@ -5,7 +5,7 @@ import {
 	useEffect,
 	ReactNode,
 } from "react";
-import { Habit, TimeBlock } from "../types";
+import { HabitT, TimeBlock } from "../types";
 import {
 	getHabits,
 	getTimeBlocks,
@@ -14,10 +14,10 @@ import {
 } from "../utils/storage";
 
 interface LoopContextType {
-	habits: Habit[];
+	habits: HabitT[];
 	timeBlocks: TimeBlock[];
-	addHabit: (habit: Omit<Habit, "id">) => void;
-	updateHabit: (id: string, habit: Omit<Habit, "id">) => void;
+	addHabit: (habit: Omit<HabitT, "id">) => void;
+	updateHabit: (id: string, habit: Omit<HabitT, "id">) => void;
 	deleteHabit: (id: string) => void;
 	addTimeBlock: (timeBlock: Omit<TimeBlock, "id">) => void;
 	toggleHabitComplete: (habitId: string) => void;
@@ -26,7 +26,7 @@ interface LoopContextType {
 const LoopContext = createContext<LoopContextType | undefined>(undefined);
 
 export function LoopProvider({ children }: { children: ReactNode }) {
-	const [habits, setHabits] = useState<Habit[]>([]);
+	const [habits, setHabits] = useState<HabitT[]>([]);
 	const [timeBlocks, setTimeBlocks] = useState<TimeBlock[]>([]);
 
 	useEffect(() => {
@@ -35,7 +35,7 @@ export function LoopProvider({ children }: { children: ReactNode }) {
 		setTimeBlocks(getTimeBlocks());
 	}, []);
 
-	const addHabit = (habitData: Omit<Habit, "id">) => {
+	const addHabit = (habitData: Omit<HabitT, "id">) => {
 		const newHabit = {
 			...habitData,
 			id: crypto.randomUUID(),
@@ -44,7 +44,7 @@ export function LoopProvider({ children }: { children: ReactNode }) {
 		setHabits((prev) => [...prev, newHabit]);
 	};
 
-	const updateHabit = (id: string, habitData: Omit<Habit, "id">) => {
+	const updateHabit = (id: string, habitData: Omit<HabitT, "id">) => {
 		const updatedHabit = { ...habitData, id };
 		const updatedHabits = habits.map((habit) =>
 			habit.id === id ? updatedHabit : habit

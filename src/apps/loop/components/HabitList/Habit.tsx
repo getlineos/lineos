@@ -1,14 +1,14 @@
-import { HabitT, TimerData } from "apps/loop/types";
 import { Button } from "antd";
-import { LuCirclePause } from "react-icons/lu";
-import { BsClock } from "react-icons/bs";
-import { CiCircleCheck } from "react-icons/ci";
+import { HabitT, TimerData } from "apps/loop/types";
 import {
-	updateTimerData,
 	getTimerData,
 	toggleHabitCompletion,
+	updateTimerData,
 } from "apps/loop/utils/storage";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { BsClock } from "react-icons/bs";
+import { CiCircleCheck } from "react-icons/ci";
+import { LuCirclePause } from "react-icons/lu";
 
 const emitTimerStopEvent = () => {
 	const event = new CustomEvent("habitTimerStop");
@@ -25,14 +25,19 @@ type HabitProps = {
 		habit: HabitT;
 		timeBlockName: string;
 	}) => void;
+	activeTimer: TimerData | null;
+	setActiveTimer: (timer: TimerData | null) => void;
+	habits: HabitT[];
 };
 
 export default function Habit({
 	habit,
 	currentDate,
 	setSelectedHabit,
+	activeTimer,
+	setActiveTimer,
+	habits,
 }: HabitProps) {
-	const [activeTimer, setActiveTimer] = useState<TimerData | null>(null);
 	const [isCompleted, setIsCompleted] = useState(false);
 	const formatTime = (minutes: number) => {
 		const mins = Math.floor(minutes);
@@ -43,29 +48,7 @@ export default function Habit({
 	useEffect(() => {
 		const timerData = getTimerData(habit.id, currentDate);
 		setIsCompleted(timerData?.isCompleted ?? false);
-	}, [habit.id, currentDate]);
-
-	useEffect(() => {
-		let interval: number;
-
-		if (activeTimer?.habitId === habit.id) {
-			interval = window.setInterval(() => {
-				setActiveTimer((prev) => {
-					if (!prev) return null;
-					return {
-						...prev,
-						totalMinutes: prev.totalMinutes + 1 / 60,
-					};
-				});
-			}, 1000);
-		}
-
-		return () => {
-			if (interval) {
-				clearInterval(interval);
-			}
-		};
-	}, [activeTimer?.habitId, habit.id]);
+	}, [currentDate]);
 
 	const getProgress = (habit: HabitT) => {
 		if (!activeTimer || activeTimer.habitId !== habit.id || !habit.goal)
@@ -79,8 +62,20 @@ export default function Habit({
 
 		if (!habit.goal) return;
 
+		if (activeTimer && activeTimer.habitId !== habit.id) {
+			const prevHabit = habits.find((h) => h.id === activeTimer.habitId);
+			if (prevHabit?.goal) {
+				updateTimerData({
+					habitId: activeTimer.habitId,
+					date: currentDate,
+					totalMinutes: activeTimer.totalMinutes,
+					isCompleted: activeTimer.totalMinutes >= prevHabit.goal.value,
+				});
+				emitTimerStopEvent();
+			}
+		}
+
 		if (activeTimer?.habitId === habit.id) {
-			console.log("stopping timer");
 			const newTotalMinutes = activeTimer.totalMinutes;
 			const newIsCompleted = newTotalMinutes >= habit.goal.value;
 
@@ -95,7 +90,6 @@ export default function Habit({
 			setActiveTimer(null);
 			emitTimerStopEvent();
 		} else {
-			console.log("starting timer");
 			const existingData = getTimerData(habit.id, currentDate);
 
 			setActiveTimer({

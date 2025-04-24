@@ -1,4 +1,4 @@
-import { HabitT } from "apps/loop/types";
+import { HabitT, TimerData } from "apps/loop/types";
 import { useEffect, useState } from "react";
 import { BsCalendar4 } from "react-icons/bs";
 import { TIME_BLOCK_BORDER_COLORS, TIME_BLOCK_COLORS } from "../../constants";
@@ -12,20 +12,14 @@ type selectedHabitT = {
 	timeBlockName: string;
 } | null;
 
-type activeTimerT = {
-	habitId: string;
-	totalMinutes: number;
-	targetMinutes: number;
-} | null;
-
 interface TodoListProps {
 	currentDate: string;
 }
 
-export default function TodoList({ currentDate }: TodoListProps) {
+export default function HabitList({ currentDate }: TodoListProps) {
 	const { habits, timeBlocks } = useLoop();
 	const [selectedHabit, setSelectedHabit] = useState<selectedHabitT>(null);
-	const [activeTimer, setActiveTimer] = useState<activeTimerT>(null);
+	const [activeTimer, setActiveTimer] = useState<TimerData | null>(null);
 
 	useEffect(() => {
 		let interval: number;
@@ -54,13 +48,14 @@ export default function TodoList({ currentDate }: TodoListProps) {
 	}, [currentDate]);
 
 	useEffect(() => {
-		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+		const handleBeforeUnload = () => {
 			if (activeTimer) {
+				const habit = habits.find((h) => h.id === activeTimer.habitId);
 				updateTimerData({
 					habitId: activeTimer.habitId,
 					date: currentDate,
 					totalMinutes: activeTimer.totalMinutes,
-					isCompleted: activeTimer.totalMinutes >= activeTimer.targetMinutes,
+					isCompleted: activeTimer.totalMinutes >= (habit?.goal?.value || 0),
 				});
 			}
 		};
@@ -70,7 +65,7 @@ export default function TodoList({ currentDate }: TodoListProps) {
 		return () => {
 			window.removeEventListener("beforeunload", handleBeforeUnload);
 		};
-	}, [activeTimer, currentDate]);
+	}, [activeTimer, currentDate, habits]);
 
 	const sortedTimeBlocks = [...timeBlocks].sort((a, b) => {
 		const timeA = a.startTime.split(":").map(Number);
@@ -98,7 +93,7 @@ export default function TodoList({ currentDate }: TodoListProps) {
 			</div>
 			<div className="space-y-6">
 				{habitsByTimeBlock.map(
-					({ timeBlock, habits, bgColor, borderColor }) => (
+					({ timeBlock, habits: blockHabits, bgColor, borderColor }) => (
 						<div
 							key={timeBlock.id}
 							className={`p-4 rounded-xl ${bgColor} border ${borderColor}`}
@@ -110,15 +105,18 @@ export default function TodoList({ currentDate }: TodoListProps) {
 								</h3>
 							</div>
 							<div className="space-y-3">
-								{habits.map((habit) => (
+								{blockHabits.map((habit) => (
 									<Habit
 										key={habit.id}
 										habit={habit}
 										currentDate={currentDate}
 										setSelectedHabit={setSelectedHabit}
+										activeTimer={activeTimer}
+										setActiveTimer={setActiveTimer}
+										habits={habits}
 									/>
 								))}
-								{habits.length === 0 && (
+								{blockHabits.length === 0 && (
 									<div className="text-center text-gray-500 py-2">
 										No habits scheduled for this time block
 									</div>
