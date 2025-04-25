@@ -1,15 +1,20 @@
-import { useEffect, useState } from "react";
 import dayjs from "dayjs";
+import { useState, useEffect } from "react";
 import {
 	useGetCurrentWeatherQuery,
 	useGetHourlyForecastQuery,
 } from "../../store/weatherApi";
 
+type CoordsT = {
+	lat: number;
+	lon: number;
+} | null;
+
 export default function WeatherWidget() {
-	const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(
-		null
-	);
+	const [coords, setCoords] = useState<CoordsT>(null);
 	const [error, setError] = useState<string | null>(null);
+	const [isCheckingPermission, setIsCheckingPermission] = useState(true);
+	const [hasPermission, setHasPermission] = useState<boolean | null>(null);
 
 	const { data: weatherData, isLoading: isWeatherLoading } =
 		useGetCurrentWeatherQuery(coords!, { skip: !coords });
@@ -17,7 +22,7 @@ export default function WeatherWidget() {
 	const { data: forecastData, isLoading: isForecastLoading } =
 		useGetHourlyForecastQuery(coords!, { skip: !coords });
 
-	useEffect(() => {
+	const getLocation = () => {
 		if (navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition(
 				(position) => {
@@ -25,6 +30,7 @@ export default function WeatherWidget() {
 						lat: position.coords.latitude,
 						lon: position.coords.longitude,
 					});
+					setError(null);
 				},
 				(error) => {
 					setError("Please enable location access to get weather data");
@@ -34,15 +40,59 @@ export default function WeatherWidget() {
 		} else {
 			setError("Geolocation is not supported by your browser");
 		}
+	};
+
+	useEffect(() => {
+		if (navigator.permissions) {
+			navigator.permissions
+				.query({ name: "geolocation" })
+				.then((permissionStatus) => {
+					setHasPermission(permissionStatus.state === "granted");
+					if (permissionStatus.state === "granted") {
+						getLocation();
+					}
+					setIsCheckingPermission(false);
+				});
+		} else {
+			setIsCheckingPermission(false);
+		}
 	}, []);
 
 	const loading = isWeatherLoading || isForecastLoading;
 
+	if (isCheckingPermission) {
+		return (
+			<div className="flex flex-col justify-center rounded-xl p-4 bg-gradient-to-b text-white cursor-pointer transform transition-transform duration-300 ease-in-out active:scale-105 focus:scale-105 hover:scale-105 select-none from-gray-900 to-gray-600 w-[400px] min-h-[223px]">
+				<div className="flex justify-center items-center h-32">
+					<p className="text-sm">Checking location permission...</p>
+				</div>
+			</div>
+		);
+	}
+
+	if (!coords && hasPermission === false) {
+		return (
+			<div className="flex flex-col justify-center rounded-xl p-4 bg-gradient-to-b text-white cursor-pointer transform transition-transform duration-300 ease-in-out active:scale-105 focus:scale-105 hover:scale-105 select-none from-gray-900 to-gray-600 w-[400px] min-h-[223px]">
+				<div className="flex flex-col justify-center items-center h-32 gap-3">
+					<p className="text-center text-sm">
+						Enable location to see weather data
+					</p>
+					<button
+						onClick={getLocation}
+						className="px-4 py-1.5 bg-blue-500 hover:bg-blue-600 rounded transition-colors text-sm"
+					>
+						Enable Location
+					</button>
+				</div>
+			</div>
+		);
+	}
+
 	if (loading) {
 		return (
-			<div className="flex flex-col justify-between rounded-xl p-4 bg-gradient-to-b text-white cursor-pointer transform transition-transform duration-300 ease-in-out active:scale-105 focus:scale-105 hover:scale-105 select-none from-gray-900 to-gray-600 w-[400px]">
+			<div className="flex flex-col justify-center rounded-xl p-4 bg-gradient-to-b text-white cursor-pointer transform transition-transform duration-300 ease-in-out active:scale-105 focus:scale-105 hover:scale-105 select-none from-gray-900 to-gray-600 w-[400px] min-h-[223px]">
 				<div className="flex justify-center items-center h-32">
-					<p>Loading weather data...</p>
+					<p className="text-sm">Loading weather data...</p>
 				</div>
 			</div>
 		);
@@ -50,9 +100,15 @@ export default function WeatherWidget() {
 
 	if (error) {
 		return (
-			<div className="flex flex-col justify-between rounded-xl p-4 bg-gradient-to-b text-white cursor-pointer transform transition-transform duration-300 ease-in-out active:scale-105 focus:scale-105 hover:scale-105 select-none from-gray-900 to-gray-600 w-[400px]">
-				<div className="flex justify-center items-center h-32">
+			<div className="flex flex-col justify-center rounded-xl p-4 bg-gradient-to-b text-white cursor-pointer transform transition-transform duration-300 ease-in-out active:scale-105 focus:scale-105 hover:scale-105 select-none from-gray-900 to-gray-600 w-[400px] min-h-[223px]">
+				<div className="flex flex-col justify-center items-center h-32 gap-4">
 					<p className="text-red-400">{error}</p>
+					<button
+						onClick={getLocation}
+						className="px-4 py-1.5 bg-blue-500 hover:bg-blue-600 rounded transition-colors text-sm"
+					>
+						Try Again
+					</button>
 				</div>
 			</div>
 		);
