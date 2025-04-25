@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { HabitT, TimerData } from "../types";
 import { getHabits, getStoredData } from "../utils/storage";
+import { formatTime } from "../utils";
 
 interface AnalyticsProps {
 	currentDate: string;
@@ -66,22 +67,6 @@ export default function Analytics({ currentDate }: AnalyticsProps) {
 	}, [currentDate]);
 
 	const maxTime = Math.max(...topHabits.map((habit) => habit.timeSpent), 1);
-
-	const formatTime = (minutes: number): string => {
-		if (minutes < 1) {
-			return `${Math.round(minutes * 60)}s`;
-		}
-
-		const hours = Math.floor(minutes / 60);
-		const mins = Math.floor(minutes % 60);
-		const secs = Math.round((minutes * 60) % 60);
-
-		if (hours > 0) {
-			return `${hours}h ${mins}m ${secs}s`;
-		}
-
-		return `${mins}m ${secs}s`;
-	};
 
 	const getTotalHoursSpent = () => {
 		const { timerData } = getStoredData();

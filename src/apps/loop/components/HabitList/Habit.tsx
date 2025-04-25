@@ -1,5 +1,6 @@
 import { Button } from "antd";
 import { HabitT, TimerData } from "apps/loop/types";
+import { formatTime } from "apps/loop/utils";
 import {
 	getTimerData,
 	toggleHabitCompletion,
@@ -39,16 +40,15 @@ export default function Habit({
 	habits,
 }: HabitProps) {
 	const [isCompleted, setIsCompleted] = useState(false);
-	const formatTime = (minutes: number) => {
-		const mins = Math.floor(minutes);
-		const secs = Math.round((minutes - mins) * 60);
-		return `${mins}:${secs.toString().padStart(2, "0")}`;
-	};
+	const [storedTimerData, setStoredTimerData] = useState<TimerData | null>(
+		null
+	);
 
 	useEffect(() => {
 		const timerData = getTimerData(habit.id, currentDate);
+		setStoredTimerData(timerData || null);
 		setIsCompleted(timerData?.isCompleted ?? false);
-	}, [currentDate]);
+	}, [currentDate, habit.id]);
 
 	const getProgress = (habit: HabitT) => {
 		if (!activeTimer || activeTimer.habitId !== habit.id || !habit.goal)
@@ -79,13 +79,15 @@ export default function Habit({
 			const newTotalMinutes = activeTimer.totalMinutes;
 			const newIsCompleted = newTotalMinutes >= habit.goal.value;
 
-			updateTimerData({
+			const updatedTimerData = {
 				habitId: habit.id,
 				date: currentDate,
 				totalMinutes: newTotalMinutes,
 				isCompleted: newIsCompleted,
-			});
+			};
 
+			updateTimerData(updatedTimerData);
+			setStoredTimerData(updatedTimerData);
 			setIsCompleted(newIsCompleted);
 			setActiveTimer(null);
 			emitTimerStopEvent();
@@ -100,12 +102,14 @@ export default function Habit({
 			});
 
 			if (!existingData) {
-				updateTimerData({
+				const newTimerData = {
 					habitId: habit.id,
 					date: currentDate,
 					totalMinutes: 0,
 					isCompleted: false,
-				});
+				};
+				updateTimerData(newTimerData);
+				setStoredTimerData(newTimerData);
 			}
 		}
 	};
@@ -174,14 +178,20 @@ export default function Habit({
 						{activeTimer?.habitId === habit.id ? (
 							<div className="flex items-center gap-2">
 								<LuCirclePause className="w-4 h-4" />
-								<span>{formatTime(activeTimer.totalMinutes)}</span>
+								<span>
+									{formatTime(
+										activeTimer.totalMinutes,
+										activeTimer.totalMinutes >= 60 ? "hm" : "ms"
+									)}
+								</span>
 							</div>
-						) : getTimerData(habit.id, currentDate)?.totalMinutes ? (
+						) : storedTimerData?.totalMinutes ? (
 							<div className="flex items-center gap-2">
 								<BsClock className="w-4 h-4" />
 								<span>
 									{formatTime(
-										getTimerData(habit.id, currentDate)?.totalMinutes || 0
+										storedTimerData.totalMinutes,
+										storedTimerData.totalMinutes >= 60 ? "hm" : "ms"
 									)}
 								</span>
 							</div>
