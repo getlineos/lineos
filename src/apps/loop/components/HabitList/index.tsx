@@ -1,5 +1,5 @@
 import { HabitT, TimerData } from "apps/loop/types";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { BsCalendar4 } from "react-icons/bs";
 import { TIME_BLOCK_BORDER_COLORS, TIME_BLOCK_COLORS } from "../../constants";
 import { useLoop } from "../../context/LoopContext";
@@ -20,19 +20,26 @@ export default function HabitList({ currentDate }: TodoListProps) {
 	const { habits, timeBlocks } = useLoop();
 	const [selectedHabit, setSelectedHabit] = useState<selectedHabitT>(null);
 	const [activeTimer, setActiveTimer] = useState<TimerData | null>(null);
+	const timerStartRef = useRef<number | null>(null);
 
 	useEffect(() => {
 		let interval: number;
 
 		if (activeTimer) {
+			timerStartRef.current = Date.now();
 			interval = window.setInterval(() => {
-				setActiveTimer((prev) => {
-					if (!prev) return null;
-					return {
-						...prev,
-						totalMinutes: prev.totalMinutes + 1 / 60,
-					};
-				});
+				if (timerStartRef.current) {
+					const elapsedMinutes =
+						(Date.now() - timerStartRef.current) / (1000 * 60);
+					setActiveTimer((prev) => {
+						if (!prev) return null;
+						return {
+							...prev,
+							totalMinutes: prev.totalMinutes + elapsedMinutes,
+						};
+					});
+					timerStartRef.current = Date.now();
+				}
 			}, 1000);
 		}
 
@@ -45,6 +52,7 @@ export default function HabitList({ currentDate }: TodoListProps) {
 
 	useEffect(() => {
 		setActiveTimer(null);
+		timerStartRef.current = null;
 	}, [currentDate]);
 
 	useEffect(() => {
