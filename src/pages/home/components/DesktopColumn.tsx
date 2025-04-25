@@ -1,5 +1,5 @@
-import DirectoryIcon from "assets/img/icons/directory.png";
-import DocIcon from "assets/img/icons/doc.png";
+import DirectoryIcon from "@/assets/img/icons/directory.png";
+import DocIcon from "@/assets/img/icons/doc.png";
 
 enum DesktopItemI {
 	DIRECTORY = "DIRECTORY",

@@ -1,6 +1,6 @@
-import Menubar from "components/Menubar";
-import TodoWidget from "widgets/Todo";
-import WeatherWidget from "widgets/Weather";
+import Menubar from "@/components/Menubar";
+import TodoWidget from "@/widgets/Todo";
+import WeatherWidget from "@/widgets/Weather";
 import DesktopColumn from "./components/DesktopColumn";
 
 export default function Home() {

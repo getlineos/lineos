@@ -1,6 +1,6 @@
-import ControlCenterIcon from "assets/img/menu/control-center.png";
-import SearchIcon from "assets/img/menu/search.png";
-import WifiIcon from "assets/img/menu/wifi.png";
+import ControlCenterIcon from "@/assets/img/menu/control-center.png";
+import SearchIcon from "@/assets/img/menu/search.png";
+import WifiIcon from "@/assets/img/menu/wifi.png";
 import useMenubar from "./useMenubar";
 
 export default function Menubar() {

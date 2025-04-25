@@ -1,4 +1,4 @@
-import { HabitT, TimerData } from "apps/loop/types";
+import { HabitT, TimerData } from "@/apps/loop/types";
 import { useEffect, useState, useRef } from "react";
 import { BsCalendar4 } from "react-icons/bs";
 import { TIME_BLOCK_BORDER_COLORS, TIME_BLOCK_COLORS } from "../../constants";

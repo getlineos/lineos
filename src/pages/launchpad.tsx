@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
-import wallpaper from "assets/img/wallpaper.jpg";
-import { allApps } from "../config/apps";
+import wallpaper from "@/assets/img/wallpaper.jpg";
+import { allApps } from "@/config/apps";
 
 export default function Launchpad() {
 	const navigate = useNavigate();

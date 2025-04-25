@@ -1,5 +1,4 @@
 import LaunchpadIcon from "../assets/img/icons/launchpad.png";
-import SafariIcon from "../assets/img/icons/safari.png";
 import MailIcon from "../assets/img/icons/mail.png";
 import MapIcon from "../assets/img/icons/map.png";
 import CalendarIcon from "../assets/img/icons/calendar.png";
@@ -59,12 +58,12 @@ export const apps: AppConfig[] = [
 		showInLaunchpad: false,
 		onClick: (navigate) => navigate("/launchpad"),
 	},
-	{
-		name: "Safari",
-		icon: SafariIcon,
-		showInDock: true,
-		showInLaunchpad: true,
-	},
+	// {
+	// 	name: "Safari",
+	// 	icon: SafariIcon,
+	// 	showInDock: true,
+	// 	showInLaunchpad: true,
+	// },
 	{
 		name: "Mail",
 		icon: MailIcon,
@@ -91,43 +90,49 @@ export const apps: AppConfig[] = [
 		icon: PhotosIcon,
 		showInDock: true,
 		showInLaunchpad: true,
+		onClick: () => window.open("https://photos.google.com"),
 	},
 	{
 		name: "Messages",
 		icon: MessagesIcon,
 		showInDock: false,
 		showInLaunchpad: true,
+		onClick: () => window.open("https://messages.google.com"),
 	},
 	{
 		name: "FaceTime",
 		icon: FaceTimeIcon,
 		showInDock: true,
 		showInLaunchpad: true,
+		onClick: () => window.open("http://meet.google.com"),
 	},
 	{
 		name: "Loop",
 		icon: LoopIcon,
 		showInDock: true,
 		showInLaunchpad: true,
-		onClick: (navigate) => navigate("/apps/loop"),
+		onClick: (navigate) => navigate("/loop"),
 	},
 	{
 		name: "Music",
 		icon: MusicIcon,
 		showInDock: true,
 		showInLaunchpad: true,
+		onClick: (navigate) => navigate("/music"),
 	},
 	{
 		name: "App Store",
 		icon: AppStoreIcon,
 		showInDock: true,
 		showInLaunchpad: true,
+		onClick: (navigate) => navigate("/store"),
 	},
 	{
 		name: "Notes",
 		icon: NotesIcon,
 		showInDock: true,
 		showInLaunchpad: true,
+		onClick: (navigate) => navigate("/notes"),
 	},
 	{
 		name: "Calculator",

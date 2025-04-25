@@ -102,7 +102,7 @@ export default function WeatherWidget() {
 		return (
 			<div className="flex flex-col justify-center rounded-xl p-4 bg-gradient-to-b text-white cursor-pointer transform transition-transform duration-300 ease-in-out active:scale-105 focus:scale-105 hover:scale-105 select-none from-gray-900 to-gray-600 w-[400px] min-h-[223px]">
 				<div className="flex flex-col justify-center items-center h-32 gap-4">
-					<p className="text-red-400">{error}</p>
+					<p className="text-sm">{error}</p>
 					<button
 						onClick={getLocation}
 						className="px-4 py-1.5 bg-blue-500 hover:bg-blue-600 rounded transition-colors text-sm"

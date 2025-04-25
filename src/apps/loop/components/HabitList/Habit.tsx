@@ -1,11 +1,11 @@
 import { Button } from "antd";
-import { HabitT, TimerData } from "apps/loop/types";
-import { formatTime } from "apps/loop/utils";
+import { HabitT, TimerData } from "@/apps/loop/types";
+import { formatTime } from "@/apps/loop/utils";
 import {
 	getTimerData,
 	toggleHabitCompletion,
 	updateTimerData,
-} from "apps/loop/utils/storage";
+} from "@/apps/loop/utils/storage";
 import { useEffect, useState } from "react";
 import { BsClock } from "react-icons/bs";
 import { CiCircleCheck } from "react-icons/ci";
