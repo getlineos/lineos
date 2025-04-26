@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router";
-import "@/assets/css/index.scss";
+import "@/assets/css/index.css";
 import { Provider } from "react-redux";
 import { store } from "./store";
 import wallpaper from "@/assets/img/wallpaper.jpg";
