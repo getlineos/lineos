@@ -22,7 +22,7 @@ export default function FeaturedApps() {
 						Create designs, interfaces and beautiful illustrations with this
 						tool
 					</p>
-					<Button className="w-24 bg-blue-500 hover:bg-blue-600">
+					<Button className="w-24 bg-blue-500 hover:bg-blue-600 text-white">
 						Download
 					</Button>
 				</div>

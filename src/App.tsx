@@ -11,6 +11,7 @@ import Notes from "@/apps/notes";
 import Music from "@/apps/music";
 import Dock from "@/components/Dock";
 import Store from "@/apps/store";
+import { Toaster } from "./components/ui/toaster";
 
 export default function App() {
 	return (
@@ -26,10 +27,12 @@ export default function App() {
 						<Route path="loop" element={<Loop />} />
 						<Route path="notes" element={<Notes />} />
 						<Route path="music" element={<Music />} />
-						<Route path="store" element={<Store />} />
+						<Route path="store/*" element={<Store />} />
 					</Route>
+					<Route path="*" element={<Home />} />
 				</Routes>
 				<Dock />
+				<Toaster />
 			</div>
 		</Provider>
 	);
