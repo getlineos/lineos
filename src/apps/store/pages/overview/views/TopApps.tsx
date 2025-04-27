@@ -4,7 +4,6 @@ import { Link } from "react-router";
 
 export default function TopApps() {
 	const [apps, setApps] = useState<any[]>([]);
-	console.log("🚀 ~ TopApps ~ apps:", apps);
 	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {

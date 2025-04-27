@@ -10,6 +10,15 @@ class Storage {
 	remove = (key: string) => localStorage.removeItem(key);
 
 	clear = () => localStorage.clear();
+
+	append = (key: string, item: any) => {
+		const current = this.get(key);
+		if (Array.isArray(current)) {
+			this.set(key, [...current, item]);
+		} else {
+			this.set(key, [item]);
+		}
+	};
 }
 
 const storage = new Storage();

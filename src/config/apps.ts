@@ -41,14 +41,32 @@ import XcodeIcon from "../assets/img/icons/xcode.png";
 import TrashIcon from "../assets/img/icons/trash.png";
 import LoopIcon from "../assets/img/icons/loop.png";
 import { useNavigate } from "react-router";
+import storage from "@/utils/storage";
+import { store } from "@/store";
+import { setInstalledApps } from "@/store/slices/installedAppsSlice";
 
 export interface AppConfig {
+	id?: string;
 	name: string;
 	icon: string;
+	slug: string;
 	onClick?: (navigate: ReturnType<typeof useNavigate>) => void;
 	showInDock?: boolean;
 	showInLaunchpad?: boolean;
+	url?: string;
 }
+
+export const initializeInstalledApps = () => {
+	const installedApps = storage.get("installedApps");
+
+	if (!installedApps) {
+		console.log("Setting installed apps");
+		storage.set("installedApps", apps);
+		store.dispatch(setInstalledApps(apps));
+	} else {
+		store.dispatch(setInstalledApps(installedApps));
+	}
+};
 
 export const apps: AppConfig[] = [
 	{
@@ -56,7 +74,7 @@ export const apps: AppConfig[] = [
 		icon: LaunchpadIcon,
 		showInDock: true,
 		showInLaunchpad: false,
-		onClick: (navigate) => navigate("/launchpad"),
+		slug: "launchpad",
 	},
 	// {
 	// 	name: "Safari",
@@ -69,236 +87,273 @@ export const apps: AppConfig[] = [
 		icon: MailIcon,
 		showInDock: true,
 		showInLaunchpad: true,
-		onClick: () => window.open("https://www.gmail.com"),
+		slug: "mail",
 	},
 	{
 		name: "Maps",
 		icon: MapIcon,
 		showInDock: true,
 		showInLaunchpad: true,
-		onClick: () => window.open("https://map.google.com"),
+		slug: "maps",
 	},
 	{
 		name: "Calendar",
 		icon: CalendarIcon,
 		showInDock: true,
 		showInLaunchpad: true,
-		onClick: () => window.open("https://calendar.google.com"),
+		slug: "calendar",
 	},
 	{
 		name: "Photos",
 		icon: PhotosIcon,
 		showInDock: true,
 		showInLaunchpad: true,
-		onClick: () => window.open("https://photos.google.com"),
+		slug: "photos",
 	},
 	{
 		name: "Messages",
 		icon: MessagesIcon,
 		showInDock: false,
 		showInLaunchpad: true,
-		onClick: () => window.open("https://messages.google.com"),
+		slug: "messages",
 	},
 	{
 		name: "FaceTime",
 		icon: FaceTimeIcon,
 		showInDock: true,
 		showInLaunchpad: true,
-		onClick: () => window.open("http://meet.google.com"),
+		slug: "facetime",
 	},
 	{
 		name: "Loop",
 		icon: LoopIcon,
 		showInDock: true,
 		showInLaunchpad: true,
-		onClick: (navigate) => navigate("/loop"),
+		slug: "loop",
 	},
 	{
 		name: "Music",
 		icon: MusicIcon,
 		showInDock: true,
 		showInLaunchpad: true,
-		onClick: (navigate) => navigate("/music"),
+		slug: "music",
 	},
 	{
 		name: "App Store",
 		icon: AppStoreIcon,
 		showInDock: true,
 		showInLaunchpad: true,
-		onClick: (navigate) => navigate("/store"),
+		slug: "store",
 	},
 	{
 		name: "Notes",
 		icon: NotesIcon,
 		showInDock: true,
 		showInLaunchpad: true,
-		onClick: (navigate) => navigate("/notes"),
+		slug: "notes",
 	},
 	{
 		name: "Calculator",
 		icon: CalculatorIcon,
 		showInDock: true,
 		showInLaunchpad: true,
+		slug: "calculator",
 	},
 	{
 		name: "Contacts",
 		icon: ContactsIcon,
 		showInDock: true,
 		showInLaunchpad: true,
+		slug: "contacts",
 	},
 	{
 		name: "Reminders",
 		icon: RemindersIcon,
 		showInDock: true,
 		showInLaunchpad: true,
+		slug: "reminders",
 	},
 	{
 		name: "TV",
 		icon: TVIcon,
 		showInDock: true,
 		showInLaunchpad: true,
+		slug: "tv",
 	},
 	{
 		name: "Books",
 		icon: BooksIcon,
 		showInDock: false,
 		showInLaunchpad: true,
+		slug: "books",
 	},
 	{
 		name: "Podcasts",
 		icon: PodcastsIcon,
 		showInDock: false,
 		showInLaunchpad: true,
+		slug: "podcasts",
 	},
 	{
 		name: "Find My",
 		icon: FindMyIcon,
 		showInLaunchpad: true,
+		slug: "find-my",
 	},
 	{
 		name: "Voice Memos",
 		icon: VoiceMemosIcon,
+		showInDock: true,
 		showInLaunchpad: true,
+		slug: "voice-memos",
 	},
 	{
 		name: "Preview",
 		icon: PreviewIcon,
 		showInDock: true,
 		showInLaunchpad: true,
+		slug: "preview",
 	},
 	{
 		name: "TextEdit",
 		icon: TextEditIcon,
 		showInDock: true,
 		showInLaunchpad: true,
+		slug: "textedit",
 	},
 	{
 		name: "Terminal",
 		icon: TerminalIcon,
 		showInDock: true,
 		showInLaunchpad: true,
+		slug: "terminal",
 	},
 	{
 		name: "Developer",
 		icon: DeveloperIcon,
 		showInLaunchpad: true,
+		slug: "developer",
 	},
 	{
 		name: "Dictionary",
 		icon: DictionaryIcon,
 		showInLaunchpad: true,
+		slug: "dictionary",
 	},
 	{
 		name: "Freeform",
 		icon: FreeFormIcon,
 		showInLaunchpad: true,
+		slug: "freeform",
 	},
 	{
 		name: "GarageBand",
 		icon: GaragebandIcon,
 		showInLaunchpad: true,
+		slug: "garageband",
 	},
 	{
 		name: "iMovie",
 		icon: IMovieIcon,
 		showInLaunchpad: true,
+		slug: "imovie",
 	},
 	{
 		name: "Keynote",
 		icon: KeynoteIcon,
 		showInLaunchpad: true,
+		slug: "keynote",
 	},
 	{
 		name: "News",
 		icon: NewsIcon,
 		showInLaunchpad: true,
+		slug: "news",
 	},
 	{
 		name: "Numbers",
 		icon: NumbersIcon,
 		showInLaunchpad: true,
+		slug: "numbers",
 	},
 	{
 		name: "Pages",
 		icon: PagesIcon,
 		showInLaunchpad: true,
+		slug: "pages",
 	},
 	{
 		name: "Photo Booth",
 		icon: PhotoBoothIcon,
 		showInLaunchpad: true,
+		slug: "photo-booth",
 	},
 	{
 		name: "Playground",
 		icon: PlaygroundIcon,
 		showInLaunchpad: true,
+		slug: "playground",
 	},
 	{
 		name: "QuickTime",
 		icon: QuicktimeIcon,
 		showInLaunchpad: true,
+		slug: "quicktime",
 	},
 	{
 		name: "Automator",
 		icon: AutomatorIcon,
 		showInLaunchpad: true,
+		slug: "automator",
 	},
 	{
 		name: "Final Cut Pro",
 		icon: CutProIcon,
 		showInLaunchpad: true,
+		slug: "final-cut-pro",
 	},
 	{
 		name: "Settings",
 		icon: SettingsIcon,
 		showInLaunchpad: true,
+		slug: "settings",
 	},
 	{
 		name: "Shortcuts",
 		icon: ShortcutsIcon,
 		showInLaunchpad: true,
+		slug: "shortcuts",
 	},
 	{
 		name: "Siri",
 		icon: SiriIcon,
 		showInLaunchpad: true,
+		slug: "siri",
 	},
 	{
 		name: "Stocks",
 		icon: StocksIcon,
 		showInLaunchpad: true,
+		slug: "stocks",
 	},
 	{
 		name: "Xcode",
 		icon: XcodeIcon,
 		showInLaunchpad: true,
+		slug: "xcode",
 	},
 	{
 		name: "Trash",
 		icon: TrashIcon,
 		showInDock: true,
 		showInLaunchpad: false,
+		slug: "trash",
 	},
 ];
+
+export const getInstalledApps = () => {
+	const installedApps = storage.get("installedApps");
+	return [...apps, ...installedApps];
+};
 
 export const allApps = apps;

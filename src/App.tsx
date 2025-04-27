@@ -12,8 +12,15 @@ import Music from "@/apps/music";
 import Dock from "@/components/Dock";
 import Store from "@/apps/store";
 import { Toaster } from "./components/ui/toaster";
+import { initializeInstalledApps } from "./config/apps";
+import { useEffect } from "react";
+import DynamicApp from "./apps/[slug]";
 
 export default function App() {
+	useEffect(() => {
+		initializeInstalledApps();
+	}, []);
+
 	return (
 		<Provider store={store}>
 			<div
@@ -28,6 +35,7 @@ export default function App() {
 						<Route path="notes" element={<Notes />} />
 						<Route path="music" element={<Music />} />
 						<Route path="store/*" element={<Store />} />
+						<Route path="/:slug" element={<DynamicApp />} />
 					</Route>
 					<Route path="*" element={<Home />} />
 				</Routes>

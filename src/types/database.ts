@@ -30,6 +30,7 @@ export interface App {
 	status: AppStatus;
 	created_at: string;
 	updated_at: string;
+	slug: string;
 }
 
 export interface AppAsset {

@@ -7,8 +7,11 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Download, ExternalLink, MoreHorizontal, Settings } from "lucide-react";
+import { useAppInstall } from "../hooks/useAppInstall";
 
 export default function AppCard({ app }: { app: any }) {
+	const { uninstallApp } = useAppInstall();
+
 	return (
 		<div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
 			<div className="p-4 flex gap-4">
@@ -40,8 +43,11 @@ export default function AppCard({ app }: { app: any }) {
 										<DropdownMenuItem>Update</DropdownMenuItem>
 										<DropdownMenuItem>Share</DropdownMenuItem>
 										<DropdownMenuItem>Information</DropdownMenuItem>
-										<DropdownMenuItem className="text-red-600">
-											Delete
+										<DropdownMenuItem
+											className="text-red-600"
+											onClick={() => uninstallApp(app.id)}
+										>
+											Uninstall
 										</DropdownMenuItem>
 									</>
 								) : (

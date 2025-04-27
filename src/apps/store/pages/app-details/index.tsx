@@ -5,7 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { placeholderImg } from "@/utils/constants";
+import { Spin } from "antd";
 import { Link, useParams } from "react-router";
+import { useAppInstall } from "../../hooks/useAppInstall";
 import { appStoreService } from "../../services/appStoreService";
 
 // Mock data for fallback
@@ -63,37 +65,38 @@ const mockApp = {
 };
 
 export default function AppDetailPage() {
-	const { id } = useParams();
+	const { id: appId } = useParams();
 	const [app, setApp] = useState(mockApp);
 	const [isLoading, setIsLoading] = useState(true);
+	const { installApp, isInstalling, isInstalled } = useAppInstall(appId ?? "");
 
 	useEffect(() => {
-		async function fetchApp() {
-			if (!id) return;
-			try {
-				const data = await appStoreService.getAppDetails(id);
-				setApp({
-					...mockApp,
-					...data,
-					icon: data.icon_url || mockApp.icon,
-					category: data.primary_category || mockApp.category,
-					subCategory: data.subcategory || mockApp.subCategory,
-					description: data.description || mockApp.description,
-					rating: data.rating || mockApp.rating,
-					reviewCount: data.reviews?.length || mockApp.reviewCount,
-					lastUpdated:
-						new Date(data.updated_at).toLocaleDateString() ||
-						mockApp.lastUpdated,
-				});
-			} catch (error) {
-				console.error("Failed to fetch app details:", error);
-			} finally {
-				setIsLoading(false);
-			}
-		}
-
 		fetchApp();
-	}, [id]);
+	}, [appId, isInstalling]);
+
+	async function fetchApp() {
+		if (!appId) return;
+
+		try {
+			const data = await appStoreService.getAppDetails(appId);
+			setApp({
+				...mockApp,
+				...data,
+				icon: data.icon_url || mockApp.icon,
+				category: data.primary_category || mockApp.category,
+				subCategory: data.subcategory || mockApp.subCategory,
+				description: data.description || mockApp.description,
+				rating: data.rating || mockApp.rating,
+				reviewCount: data.reviews?.length || mockApp.reviewCount,
+				lastUpdated:
+					new Date(data.updated_at).toLocaleDateString() || mockApp.lastUpdated,
+			});
+		} catch (error) {
+			console.error("Failed to fetch app details:", error);
+		} finally {
+			setIsLoading(false);
+		}
+	}
 
 	if (isLoading) {
 		return <div className="container max-w-7xl py-6">Loading...</div>;
@@ -101,7 +104,6 @@ export default function AppDetailPage() {
 
 	return (
 		<div className="container max-w-7xl p-6 space-y-8 bg-white rounded-lg">
-			{/* Back button */}
 			<div>
 				<Button variant="ghost" size="sm" asChild>
 					<Link to="/store" className="flex items-center gap-1">
@@ -111,7 +113,6 @@ export default function AppDetailPage() {
 				</Button>
 			</div>
 
-			{/* App header */}
 			<div className="flex flex-col md:flex-row gap-6">
 				<div className="flex-shrink-0">
 					<img
@@ -153,9 +154,17 @@ export default function AppDetailPage() {
 						<div className="text-sm text-muted-foreground">{app.size}</div>
 					</div>
 					<div className="flex flex-wrap gap-3 pt-2">
-						<Button className="gap-2">
-							<Download className="h-4 w-4" />
-							{app.price === "Free" ? "Get" : app.price}
+						<Button
+							className="gap-2 btn-install"
+							onClick={() => appId && installApp(appId)}
+						>
+							{isInstalled ? null : isInstalling ? (
+								<Spin percent="auto" size="small" style={{ color: "white" }} />
+							) : (
+								<Download className="h-4 w-4" />
+							)}
+
+							{isInstalled ? "Open" : app.price ?? "Get"}
 						</Button>
 						<Button variant="outline" size="icon">
 							<Share2 className="h-4 w-4" />
@@ -164,7 +173,6 @@ export default function AppDetailPage() {
 				</div>
 			</div>
 
-			{/* Screenshots carousel */}
 			<div className="space-y-4">
 				<h2 className="text-xl font-semibold">Screenshots</h2>
 				<div className="flex gap-4 overflow-x-auto pb-4 snap-x">
@@ -185,7 +193,6 @@ export default function AppDetailPage() {
 				</div>
 			</div>
 
-			{/* App details tabs */}
 			<Tabs defaultValue="about" className="w-full">
 				<TabsList className="grid w-full grid-cols-3 md:w-fit">
 					<TabsTrigger value="about">About</TabsTrigger>

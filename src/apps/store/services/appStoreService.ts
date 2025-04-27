@@ -55,6 +55,11 @@ export const appStoreService = {
 		};
 	},
 
+	async getAppMetadata(id: string) {
+		const app = await appStoreRepository.getAppById(id);
+		return app;
+	},
+
 	async updateApp(
 		id: string,
 		appData: Database["public"]["Tables"]["apps"]["Update"]
@@ -130,6 +135,11 @@ export const appStoreService = {
 
 	async publishApp(formData: AppSubmissionForm) {
 		try {
+			const slug = formData.name
+				.toLowerCase()
+				.replace(/[^a-z0-9]+/g, "-")
+				.replace(/^-+|-+$/g, "");
+
 			const app = await appStoreRepository.createApp({
 				name: formData.name,
 				description: formData.description,
@@ -146,6 +156,7 @@ export const appStoreService = {
 				is_preorder: false,
 				age_rating: "4+",
 				icon_url: formData.icon,
+				slug,
 			});
 
 			return {

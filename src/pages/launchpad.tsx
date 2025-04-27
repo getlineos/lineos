@@ -1,11 +1,13 @@
-import { useNavigate } from "react-router";
-import { useEffect, useState } from "react";
 import wallpaper from "@/assets/img/wallpaper.jpg";
-import { allApps } from "@/config/apps";
+import { RootState } from "@/store";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 
 export default function Launchpad() {
 	const navigate = useNavigate();
 	const [currentPage, setCurrentPage] = useState(0);
+	const apps = useSelector((state: RootState) => state.installedApps.apps);
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
@@ -23,8 +25,8 @@ export default function Launchpad() {
 	};
 
 	const ITEMS_PER_PAGE = 35;
-	const totalPages = Math.ceil(allApps.length / ITEMS_PER_PAGE);
-	const currentApps = allApps
+	const totalPages = Math.ceil(apps.length / ITEMS_PER_PAGE);
+	const currentApps = apps
 		.filter((app) => app.showInLaunchpad !== false)
 		.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE);
 
@@ -50,7 +52,7 @@ export default function Launchpad() {
 								className="flex flex-col items-center gap-1 sm:gap-2 cursor-default"
 								onClick={(e) => {
 									e.stopPropagation();
-									app.onClick?.(navigate);
+									navigate(`/${app.slug}`);
 								}}
 							>
 								<img

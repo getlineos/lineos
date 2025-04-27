@@ -7,13 +7,11 @@ export function useAuth() {
 	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
-		// Get initial session
 		supabase.auth.getSession().then(({ data: { session } }) => {
 			setSession(session);
 			setIsLoading(false);
 		});
 
-		// Listen for auth changes
 		const {
 			data: { subscription },
 		} = supabase.auth.onAuthStateChange((_event, session) => {

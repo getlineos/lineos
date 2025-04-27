@@ -16,7 +16,6 @@ export default function SubmissionCard() {
 	} = useFormContext();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const navigate = useNavigate();
-	console.log("🚀 ~ SubmissionCard ~ isValid:", isValid, errors);
 
 	const handleSubmit = async () => {
 		if (!isValid) return;

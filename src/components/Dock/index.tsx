@@ -14,7 +14,7 @@ export default function Dock() {
 				ref={wrapperRef}
 				className="flex h-[70px] flex-row justify-center items-end bg-white px-2 bg-opacity-10 w-max m-auto rounded-[18px]"
 			>
-				{apps.map(({ name, icon, onClick }, idx) => (
+				{apps.map(({ name, icon, slug }, idx) => (
 					<div
 						key={name}
 						className="w-[60px] align-bottom dock-item flex flex-col items-center mb-[3px]"
@@ -23,7 +23,7 @@ export default function Dock() {
 						onMouseLeave={() => onItemsMouseLeave(idx)}
 						onClick={(e) => {
 							e.stopPropagation();
-							onClick?.(navigate);
+							navigate(`/${slug}`);
 						}}
 					>
 						<img src={icon} className="select-none w-full" />
