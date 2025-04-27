@@ -1,3 +1,4 @@
+import { cn } from "@/utils";
 import { Empty } from "antd";
 import { useState } from "react";
 import { IoAddOutline } from "react-icons/io5";
@@ -9,15 +10,24 @@ type TodoT = {
 
 export default function TodoWidget() {
 	const [todos] = useState<TodoT[]>([]);
+	const isLg = window.innerHeight > 900;
 
 	return (
-		<div className="bg-white w-[400px] rounded-xl min-h-10 px-2.5 py-2 relative">
+		<div
+			className={cn(
+				"bg-white w-[400px] rounded-xl px-2.5 py-2 relative",
+				isLg ? "min-h-10" : "min-h-8"
+			)}
+		>
 			<h2 className="font-semibold text-sm">Today</h2>
 			<div>
 				{todos?.length ? (
 					todos.map((todo) => <div>{todo.title}</div>)
 				) : (
-					<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} className="my-16" />
+					<Empty
+						image={Empty.PRESENTED_IMAGE_SIMPLE}
+						className={cn(isLg ? "my-16" : "my-12")}
+					/>
 				)}
 			</div>
 

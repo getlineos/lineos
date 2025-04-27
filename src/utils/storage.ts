@@ -19,6 +19,15 @@ class Storage {
 			this.set(key, [item]);
 		}
 	};
+
+	prepend = (key: string, item: any) => {
+		const current = this.get(key);
+		if (Array.isArray(current)) {
+			this.set(key, [item, ...current]);
+		} else {
+			this.set(key, [item]);
+		}
+	};
 }
 
 const storage = new Storage();

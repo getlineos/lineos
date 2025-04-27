@@ -1,7 +1,7 @@
 import AppFrame from "@/components/AppFrame";
 import { AppConfig } from "@/config/apps";
 import storage from "@/utils/storage";
-import { useParams } from "react-router";
+import { Navigate, useParams } from "react-router";
 
 export default function AppPage() {
 	const { slug } = useParams();
@@ -11,7 +11,7 @@ export default function AppPage() {
 	});
 
 	if (!app) {
-		return <div>App not found</div>;
+		return <Navigate to="/" />;
 	}
 
 	return <AppFrame app={app} />;

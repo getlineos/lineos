@@ -1,16 +1,18 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
+	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Download, ExternalLink, MoreHorizontal, Settings } from "lucide-react";
+import { useNavigate } from "react-router";
 import { useAppInstall } from "../hooks/useAppInstall";
 
 export default function AppCard({ app }: { app: any }) {
 	const { uninstallApp } = useAppInstall();
+	const navigate = useNavigate();
 
 	return (
 		<div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -100,8 +102,14 @@ export default function AppCard({ app }: { app: any }) {
 									<Download className="h-3.5 w-3.5 mr-1" /> Update
 								</Button>
 							) : (
-								<Button size="sm" variant="outline" className="h-8">
-									<ExternalLink className="h-3.5 w-3.5 mr-1" /> Open
+								<Button
+									size="sm"
+									variant="outline"
+									className="h-8"
+									onClick={() => navigate(`/${app.slug}`)}
+								>
+									<ExternalLink className="h-3.5 w-3.5 mr-1" />
+									Open
 								</Button>
 							)}
 						</>

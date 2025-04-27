@@ -22,8 +22,8 @@ const installedAppsSlice = createSlice({
 			state.apps = action.payload;
 		},
 		addInstalledApp: (state, action: PayloadAction<AppConfig>) => {
-			storage.append("installedApps", action.payload);
-			state.apps.push(action.payload);
+			storage.prepend("installedApps", action.payload);
+			state.apps.unshift(action.payload);
 		},
 		removeInstalledApp: (state, action: PayloadAction<string>) => {
 			const currentApps = storage.get("installedApps") ?? [];

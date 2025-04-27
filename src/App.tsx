@@ -14,10 +14,11 @@ import DynamicApp from "./apps/[slug]";
 import ZrxbPage from "./apps/zrxb";
 import { Toaster } from "./components/ui/toaster";
 import { initializeInstalledApps } from "./config/apps";
+import ResetPage from "./pages/reset";
 import { store } from "./store";
 export default function App() {
 	useEffect(() => {
-		initializeInstalledApps(true);
+		initializeInstalledApps();
 	}, []);
 
 	return (
@@ -29,6 +30,7 @@ export default function App() {
 				<Routes>
 					<Route path="/" element={<Home />} />
 					<Route path="/launchpad" element={<Launchpad />} />
+					<Route path="/reset" element={<ResetPage />} />
 					<Route path="/" element={<AppWrapper />}>
 						<Route path="loop" element={<Loop />} />
 						<Route path="music" element={<Music />} />
@@ -36,7 +38,6 @@ export default function App() {
 						<Route path="zrxb" element={<ZrxbPage />} />
 						<Route path="/:slug" element={<DynamicApp />} />
 					</Route>
-					<Route path="*" element={<Home />} />
 				</Routes>
 				<Dock />
 				<Toaster />
