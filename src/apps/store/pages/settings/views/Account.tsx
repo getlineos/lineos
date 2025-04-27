@@ -26,10 +26,12 @@ import { ChevronRight, CreditCard, LogOut, Trash2 } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import { authService } from "../../../services/authService";
 import { useState } from "react";
+import { useAppSelector } from "@/store/hooks";
 
 export default function Account() {
-	const navigate = useNavigate();
 	const [isLoggingOut, setIsLoggingOut] = useState(false);
+	const user = useAppSelector((state) => state.auth.user);
+	const navigate = useNavigate();
 
 	const handleLogout = async () => {
 		try {
@@ -59,9 +61,13 @@ export default function Account() {
 					</div>
 				</div>
 				<div>
-					<h2 className="text-xl font-semibold">John Doe</h2>
-					<p className="text-gray-500">john.doe@example.com</p>
-					<Badge className="mt-1 bg-snow">Apple ID</Badge>
+					<h2 className="text-xl font-semibold">
+						{user?.user_metadata.name ??
+							user?.email?.split("@")[0] ??
+							"John Doe"}
+					</h2>
+					<p className="text-gray-500">{user?.email}</p>
+					<Badge className="mt-1">Apple ID</Badge>
 				</div>
 			</div>
 
@@ -83,11 +89,7 @@ export default function Account() {
 					</div>
 					<div className="space-y-2">
 						<Label htmlFor="email">Email Address</Label>
-						<Input
-							id="email"
-							type="email"
-							defaultValue="john.doe@example.com"
-						/>
+						<Input id="email" type="email" defaultValue={user?.email} />
 					</div>
 					<div className="space-y-2">
 						<Label htmlFor="phone">Phone Number</Label>

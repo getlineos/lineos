@@ -28,6 +28,21 @@ class Storage {
 			this.set(key, [item]);
 		}
 	};
+
+	getMetaData = (key: string) => {
+		const metaData = this.get("meta-data") ?? {};
+
+		if (key) {
+			return metaData[key];
+		}
+
+		return metaData;
+	};
+
+	setMetaData = (data: any) => {
+		const metaData = this.get("meta-data") ?? {};
+		this.set("meta-data", { ...metaData, ...data });
+	};
 }
 
 const storage = new Storage();

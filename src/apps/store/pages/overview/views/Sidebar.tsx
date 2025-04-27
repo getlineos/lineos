@@ -1,3 +1,5 @@
+import { useAppSelector } from "@/store/hooks";
+import { useGetProfileQuery } from "@/store/slices/profileApi";
 import { cn } from "@/utils";
 import {
 	ChartNoAxesColumnIncreasing,
@@ -16,11 +18,13 @@ import {
 	Wrench,
 } from "lucide-react";
 import { Link, useLocation } from "react-router";
-import { useAppSelector } from "@/store/hooks";
 
 export default function Sidebar() {
-	const appStore = useAppSelector((state) => state.appStore);
-	const isDeveloper = appStore.settings.developer.isDeveloper;
+	const { user } = useAppSelector((state) => state.auth);
+	const { data: profile } = useGetProfileQuery(user?.id || "", {
+		skip: !user?.id,
+	});
+	const isDeveloper = user && profile?.developer_status === "approved";
 
 	return (
 		<div className="w-64 bg-white border-r border-gray-200">

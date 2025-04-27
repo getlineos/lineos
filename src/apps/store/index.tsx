@@ -1,3 +1,4 @@
+import AuthModal from "@/components/Modals/AuthModal";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -9,9 +10,14 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { useAppSelector } from "@/store/hooks";
+import { logout, setAuthRequired } from "@/store/slices/auth";
+import { placeholderUserImg } from "@/utils/constants";
 import { Bell, Search } from "lucide-react";
 import { useState } from "react";
-import { Link, Route, Routes, useLocation } from "react-router";
+import { useDispatch } from "react-redux";
+import { Route, Routes, useLocation, useNavigate } from "react-router";
+import AuthGuard from "./components/AuthGuard";
 import APIPage from "./pages/api";
 import AppDetailPage from "./pages/app-details";
 import ArcadePage from "./pages/arcade";
@@ -38,23 +44,26 @@ export default function AppStore() {
 				<main className="p-6">
 					<Routes>
 						<Route index element={<OverviewPage />} />
-						<Route path="billing" element={<BillingPage />} />
-						<Route path="settings" element={<SettingsPage />} />
 						<Route path="support" element={<SupportPage />} />
-						<Route path="publish" element={<PublishPage />} />
 						<Route path="api" element={<APIPage />} />
 						<Route path="arcade" element={<ArcadePage />} />
-						<Route path="categories" element={<CategoriesPage />} />
 						<Route path="my-apps" element={<MyApps />} />
-						<Route path="reviews" element={<MyReviews />} />
-						<Route path="dev-application" element={<DevApplication />} />
-						<Route path="developer">
-							<Route path="apps" element={<DeveloperApps />} />
+						<Route path="categories" element={<CategoriesPage />} />
+						<Route element={<AuthGuard />}>
+							<Route path="publish" element={<PublishPage />} />
+							<Route path="billing" element={<BillingPage />} />
+							<Route path="settings" element={<SettingsPage />} />
+							<Route path="reviews" element={<MyReviews />} />
+							<Route path="dev-application" element={<DevApplication />} />
+							<Route path="developer">
+								<Route path="apps" element={<DeveloperApps />} />
+							</Route>
 						</Route>
 						<Route path="app/:id" element={<AppDetailPage />} />
 					</Routes>
 				</main>
 			</div>
+			<AuthModal />
 		</div>
 	);
 }
@@ -62,16 +71,55 @@ export default function AppStore() {
 const Header = () => {
 	const location = useLocation();
 	const path = location.pathname.split("/").pop() || "overview";
-	const [isLoggingOut, setIsLoggingOut] = useState(false);
+	const [, setIsLoggingOut] = useState(false);
+	const navigate = useNavigate();
+	const { user } = useAppSelector((state) => state.auth);
+	const dispatch = useDispatch();
 
 	const handleLogout = async () => {
 		try {
 			setIsLoggingOut(true);
 			await authService.signOut();
+			dispatch(logout());
 		} catch (error) {
 			console.error("Failed to logout:", error);
 		} finally {
 			setIsLoggingOut(false);
+		}
+	};
+
+	const handleMenuClick = (key: string) => {
+		switch (key) {
+			case "billing":
+				checkUser();
+				navigate("/store/billing");
+				break;
+			case "reviews":
+				checkUser();
+				navigate("/store/reviews");
+				break;
+			case "settings":
+				checkUser();
+				navigate("/store/settings");
+				break;
+			case "support":
+				navigate("/store/support");
+				break;
+			case "login":
+				dispatch(setAuthRequired(true));
+				break;
+			case "logout":
+				handleLogout();
+				break;
+			default:
+				break;
+		}
+	};
+
+	const checkUser = () => {
+		if (!user) {
+			dispatch(setAuthRequired(true));
+			return;
 		}
 	};
 
@@ -95,7 +143,7 @@ const Header = () => {
 						<DropdownMenuTrigger asChild>
 							<button className="w-8 h-8 rounded-full bg-gray-300 overflow-hidden cursor-pointer">
 								<img
-									src="https://www.electricallicenserenewal.com/app-assets/images/avatar/avatar-7.png"
+									src={user?.user_metadata.avatar_url || placeholderUserImg}
 									alt="Profile"
 									width={32}
 									height={32}
@@ -107,48 +155,42 @@ const Header = () => {
 							<DropdownMenuLabel>My Account</DropdownMenuLabel>
 							<DropdownMenuSeparator />
 							<DropdownMenuGroup>
-								<DropdownMenuItem asChild className="cursor-pointer">
-									<Link to="/store/my-apps">
-										My Apps
-										<DropdownMenuShortcut>⌘A</DropdownMenuShortcut>
-									</Link>
+								<DropdownMenuItem
+									className="cursor-pointer"
+									onClick={() => handleMenuClick("billing")}
+								>
+									Billing
+									<DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
 								</DropdownMenuItem>
-								<DropdownMenuItem asChild className="cursor-pointer">
-									<Link to="#">
-										Purchases
-										<DropdownMenuShortcut>⌘P</DropdownMenuShortcut>
-									</Link>
-								</DropdownMenuItem>
-								<DropdownMenuItem asChild className="cursor-pointer">
-									<Link to="/store/reviews">
-										My Reviews
-										<DropdownMenuShortcut>⌘R</DropdownMenuShortcut>
-									</Link>
+								<DropdownMenuItem
+									className="cursor-pointer"
+									onClick={() => handleMenuClick("reviews")}
+								>
+									My Reviews
+									<DropdownMenuShortcut>⌘R</DropdownMenuShortcut>
 								</DropdownMenuItem>
 							</DropdownMenuGroup>
 							<DropdownMenuSeparator />
-							<DropdownMenuItem asChild className="cursor-pointer">
-								<Link to="/store/billing">
-									Billing
-									<DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-								</Link>
+							<DropdownMenuItem
+								className="cursor-pointer"
+								onClick={() => handleMenuClick("settings")}
+							>
+								Settings
+								<DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
 							</DropdownMenuItem>
-							<DropdownMenuItem asChild className="cursor-pointer">
-								<Link to="/store/settings">
-									Settings
-									<DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-								</Link>
-							</DropdownMenuItem>
-							<DropdownMenuItem asChild className="cursor-pointer">
-								<Link to="#">Support</Link>
+							<DropdownMenuItem
+								className="cursor-pointer"
+								onClick={() => handleMenuClick("support")}
+							>
+								Support
+								<DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
 							</DropdownMenuItem>
 							<DropdownMenuSeparator />
 							<DropdownMenuItem
 								className="cursor-pointer"
-								onClick={handleLogout}
-								disabled={isLoggingOut}
+								onClick={() => handleMenuClick(user ? "logout" : "login")}
 							>
-								{isLoggingOut ? "Logging out..." : "Log out"}
+								{user ? "Log out" : "Login"}
 								<DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
 							</DropdownMenuItem>
 						</DropdownMenuContent>

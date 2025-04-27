@@ -1,5 +1,5 @@
 import wallpaper from "@/assets/img/wallpaper.jpg";
-import { RootState } from "@/store";
+import { RootState } from "@/store/persistence";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
@@ -7,7 +7,8 @@ import { useNavigate } from "react-router";
 export default function Launchpad() {
 	const navigate = useNavigate();
 	const [currentPage, setCurrentPage] = useState(0);
-	const apps = useSelector((state: RootState) => state.installedApps.apps);
+	const apps = useSelector((state: RootState) => state.installedApps?.apps);
+	console.log("------apps", apps);
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {

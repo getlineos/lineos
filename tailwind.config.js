@@ -10,6 +10,7 @@ export default {
 					400: "#FFD54F",
 				},
 				snow: "#fff",
+				dark: "#111",
 				primary: {
 					DEFAULT: "hsl(var(--primary))",
 					foreground: "hsl(var(--primary-foreground))",

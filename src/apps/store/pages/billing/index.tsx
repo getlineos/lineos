@@ -192,7 +192,7 @@ export default function Billing() {
 					<h2 className="text-xl font-semibold">Your Payment Methods</h2>
 					<Dialog>
 						<DialogTrigger asChild>
-							<Button className="bg-snow">
+							<Button>
 								<Plus className="h-4 w-4 mr-2" /> Add Payment Method
 							</Button>
 						</DialogTrigger>

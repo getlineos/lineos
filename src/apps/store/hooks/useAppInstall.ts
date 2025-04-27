@@ -1,16 +1,17 @@
-import { RootState, store } from "@/store";
+import { RootState, store } from "@/store/persistence";
 import {
 	addInstalledApp,
 	removeInstalledApp,
-} from "@/store/slices/installedAppsSlice";
+} from "@/store/slices/installedApps";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { appStoreService } from "../services/appStoreService";
 
 export function useAppInstall(appId?: string) {
-	const apps = useSelector((state: RootState) => state.installedApps.apps);
+	const apps = useSelector((state: RootState) => state.installedApps?.apps);
 	const [isInstalling, setIsInstalling] = useState(false);
 	const [isInstalled, setIsInstalled] = useState(false);
+	const [progress, setProgress] = useState(0);
 
 	useEffect(() => {
 		if (appId) {
@@ -23,8 +24,18 @@ export function useAppInstall(appId?: string) {
 
 		try {
 			setIsInstalling(true);
+			setProgress(0);
+
+			// Simulate progress updates
 			const data = await appStoreService.getAppMetadata(appId);
-			await new Promise((resolve) => setTimeout(resolve, 2000));
+			setProgress(25);
+
+			await new Promise((resolve) => setTimeout(resolve, 1000));
+			setProgress(50);
+
+			await new Promise((resolve) => setTimeout(resolve, 1000));
+			setProgress(75);
+
 			const appPayload = {
 				id: data.id,
 				name: data.name,
@@ -35,11 +46,13 @@ export function useAppInstall(appId?: string) {
 				url: data.app_url,
 			};
 			store.dispatch(addInstalledApp(appPayload));
+			setProgress(100);
 			setIsInstalled(true);
 		} catch (error) {
 			console.error(error);
 		} finally {
 			setIsInstalling(false);
+			setProgress(0);
 		}
 	};
 
@@ -53,5 +66,6 @@ export function useAppInstall(appId?: string) {
 		isInstalling,
 		isInstalled,
 		uninstallApp,
+		progress,
 	};
 }

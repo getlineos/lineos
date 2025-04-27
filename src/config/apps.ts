@@ -42,8 +42,8 @@ import TrashIcon from "../assets/img/icons/trash.png";
 import LoopIcon from "../assets/img/icons/loop.png";
 import { useNavigate } from "react-router";
 import storage from "@/utils/storage";
-import { store } from "@/store";
-import { setInstalledApps } from "@/store/slices/installedAppsSlice";
+import { store } from "@/store/persistence";
+import { setInstalledApps } from "@/store/slices/installedApps";
 
 export interface AppConfig {
 	id?: string;

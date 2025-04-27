@@ -1,31 +1,41 @@
-import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { AppDispatch } from "@/store/persistence";
+import { setLoading, setSession, setUser } from "@/store/slices/auth";
 import { Session } from "@supabase/supabase-js";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 
 export function useAuth() {
-	const [session, setSession] = useState<Session | null>(null);
+	const [authSession, setAuthSession] = useState<Session | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
+	const dispatch = useDispatch<AppDispatch>();
 
 	useEffect(() => {
 		supabase.auth.getSession().then(({ data: { session } }) => {
-			setSession(session);
+			setAuthSession(session);
 			setIsLoading(false);
+			dispatch(setSession(session));
+			dispatch(setUser(session?.user ?? null));
+			dispatch(setLoading(false));
 		});
 
 		const {
 			data: { subscription },
 		} = supabase.auth.onAuthStateChange((_event, session) => {
-			setSession(session);
+			setAuthSession(session);
 			setIsLoading(false);
+			dispatch(setSession(session));
+			dispatch(setUser(session?.user ?? null));
+			dispatch(setLoading(false));
 		});
 
 		return () => subscription.unsubscribe();
-	}, []);
+	}, [dispatch]);
 
 	return {
-		session,
+		session: authSession,
 		isLoading,
-		isAuthenticated: !!session,
-		user: session?.user,
+		isAuthenticated: !!authSession,
+		user: authSession?.user,
 	};
 }

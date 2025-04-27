@@ -1,7 +1,7 @@
 import {
 	useGetCurrentWeatherQuery,
 	useGetHourlyForecastQuery,
-} from "@/store/weatherApi";
+} from "@/store/apis/weatherApi";
 import { useEffect, useState } from "react";
 
 type CoordsT = {
@@ -33,7 +33,6 @@ export default function useWeather() {
 
 	useEffect(() => {
 		if (navigator.permissions) {
-			console.log("navigator.permissions", navigator.permissions);
 			navigator.permissions
 				.query({ name: "geolocation" })
 				.then((permissionStatus) => {
