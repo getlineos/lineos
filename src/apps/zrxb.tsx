@@ -6,7 +6,7 @@ let url = "https://speedtest.telstra.com/";
 // url = "https://mail.tm/en/";
 // url = "https://pomofocus.io";
 // url = "https://pomodorotimer.online";
-url = "https://pomodorokitty.com/";
+url = "https://hoppscotch.io";
 
 const zrxb: AppConfig = {
 	name: "zrxb",

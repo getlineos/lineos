@@ -13,7 +13,7 @@ export default function WeatherWidget() {
 		<div>
 			<div
 				className={cn(
-					"flex flex-col gap-3 justify-between p-4 rounded-t-xl hover:rounded-b-xl bg-gradient-to-b text-white select-none from-gray-900 to-gray-600 w-[400px]",
+					"flex flex-col gap-3 justify-between p-4 rounded-t-xl bg-gradient-to-b text-white select-none from-gray-900 to-gray-600 w-[400px]",
 					isLg ? "min-h-[224px]" : "min-h-[200px]",
 					hasPermission && "rounded-b-xl"
 				)}
