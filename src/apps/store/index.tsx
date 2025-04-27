@@ -13,6 +13,7 @@ import { Bell, Search } from "lucide-react";
 import { useState } from "react";
 import { Link, Route, Routes, useLocation } from "react-router";
 import APIPage from "./pages/api";
+import AppDetailPage from "./pages/app-details";
 import ArcadePage from "./pages/arcade";
 import BillingPage from "./pages/billing";
 import CategoriesPage from "./pages/categories";
@@ -50,6 +51,7 @@ export default function AppStore() {
 						<Route path="developer">
 							<Route path="apps" element={<DeveloperApps />} />
 						</Route>
+						<Route path="app/:id" element={<AppDetailPage />} />
 					</Routes>
 				</main>
 			</div>

@@ -167,10 +167,10 @@ export const appStoreService = {
 			.order("created_at", { ascending: false });
 
 		if (error) {
-			console.error("Error fetching apps:", error);
+			console.error("Error fetching published apps:", error);
 			throw error;
 		}
 
-		return data;
+		return data.map(transformAppData);
 	},
 };
