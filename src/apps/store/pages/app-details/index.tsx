@@ -6,11 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { placeholderImg } from "@/utils/constants";
 import { Spin } from "antd";
-import { Link, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import { useAppInstall } from "../../hooks/useAppInstall";
 import { appStoreService } from "../../services/appStoreService";
 
-// Mock data for fallback
 const mockApp = {
 	id: "mock",
 	name: "Minecraft",
@@ -22,6 +21,7 @@ const mockApp = {
 	reviewCount: 2500000,
 	price: "$6.99",
 	size: "173 MB",
+	slug: "minecraft",
 	ageRating: "9+",
 	version: "1.20.0",
 	lastUpdated: "May 15, 2023",
@@ -69,6 +69,7 @@ export default function AppDetailPage() {
 	const [app, setApp] = useState(mockApp);
 	const [isLoading, setIsLoading] = useState(true);
 	const { installApp, isInstalling, isInstalled } = useAppInstall(appId ?? "");
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		fetchApp();
@@ -154,18 +155,32 @@ export default function AppDetailPage() {
 						<div className="text-sm text-muted-foreground">{app.size}</div>
 					</div>
 					<div className="flex flex-wrap gap-3 pt-2">
-						<Button
-							className="gap-2 btn-install"
-							onClick={() => appId && installApp(appId)}
-						>
-							{isInstalled ? null : isInstalling ? (
-								<Spin percent="auto" size="small" style={{ color: "white" }} />
-							) : (
-								<Download className="h-4 w-4" />
-							)}
+						{isInstalled ? (
+							<Button
+								className="gap-2"
+								onClick={() => navigate(`/${app.slug}`)}
+							>
+								Open
+							</Button>
+						) : (
+							<Button
+								className="gap-2 btn-install"
+								onClick={() => appId && installApp(appId)}
+							>
+								{isInstalling ? (
+									<Spin
+										percent="auto"
+										size="small"
+										style={{ color: "white" }}
+										className="mr-0.5"
+									/>
+								) : (
+									<Download className="h-4 w-4" />
+								)}
 
-							{isInstalled ? "Open" : app.price ?? "Get"}
-						</Button>
+								{app.price ?? "Get"}
+							</Button>
+						)}
 						<Button variant="outline" size="icon">
 							<Share2 className="h-4 w-4" />
 						</Button>

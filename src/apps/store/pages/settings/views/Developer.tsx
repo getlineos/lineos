@@ -36,6 +36,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { authService } from "../../../services/authService";
 import { useAuth } from "../../../hooks/useAuth";
+import { initializeInstalledApps } from "@/config/apps";
 
 export default function Developer() {
 	const dispatch = useDispatch();
@@ -204,7 +205,12 @@ export default function Developer() {
 										Configure app usage analytics
 									</p>
 								</div>
-								<Button variant="outline">Configure</Button>
+								<Button
+									variant="outline"
+									onClick={() => initializeInstalledApps(true)}
+								>
+									Configure
+								</Button>
 							</div>
 						</CardContent>
 					</Card>

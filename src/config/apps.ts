@@ -50,16 +50,18 @@ export interface AppConfig {
 	name: string;
 	icon: string;
 	slug: string;
+	url?: string;
 	onClick?: (navigate: ReturnType<typeof useNavigate>) => void;
 	showInDock?: boolean;
 	showInLaunchpad?: boolean;
-	url?: string;
+	allow?: string;
+	sandbox?: string;
 }
 
-export const initializeInstalledApps = () => {
+export const initializeInstalledApps = (forceUpdate?: boolean) => {
 	const installedApps = storage.get("installedApps");
 
-	if (!installedApps) {
+	if (!installedApps || forceUpdate) {
 		console.log("Setting installed apps");
 		storage.set("installedApps", apps);
 		store.dispatch(setInstalledApps(apps));
@@ -72,34 +74,34 @@ export const apps: AppConfig[] = [
 	{
 		name: "Launchpad",
 		icon: LaunchpadIcon,
+		slug: "launchpad",
 		showInDock: true,
 		showInLaunchpad: false,
-		slug: "launchpad",
 	},
-	// {
-	// 	name: "Safari",
-	// 	icon: SafariIcon,
-	// 	showInDock: true,
-	// 	showInLaunchpad: true,
-	// },
 	{
 		name: "Mail",
 		icon: MailIcon,
-		showInDock: true,
-		showInLaunchpad: true,
 		slug: "mail",
+		url: "https://mail.google.com",
+		showInLaunchpad: true,
+		allow:
+			"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
+		sandbox: "allow-same-origin allow-scripts allow-popups allow-forms",
 	},
 	{
 		name: "Maps",
 		icon: MapIcon,
+		slug: "maps",
+		url: "https://satellites.pro",
 		showInDock: true,
 		showInLaunchpad: true,
-		slug: "maps",
+		allow:
+			"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
+		sandbox: "allow-same-origin allow-scripts allow-popups allow-forms",
 	},
 	{
 		name: "Calendar",
 		icon: CalendarIcon,
-		showInDock: true,
 		showInLaunchpad: true,
 		slug: "calendar",
 	},
@@ -342,6 +344,7 @@ export const apps: AppConfig[] = [
 		showInLaunchpad: true,
 		slug: "xcode",
 	},
+	...getDevApps(),
 	{
 		name: "Trash",
 		icon: TrashIcon,
@@ -355,5 +358,21 @@ export const getInstalledApps = () => {
 	const installedApps = storage.get("installedApps");
 	return [...apps, ...installedApps];
 };
+
+export function getDevApps() {
+	if (window.location.hostname === "localhost") {
+		return [
+			{
+				name: "Zrxb",
+				icon: XcodeIcon,
+				showInLaunchpad: true,
+				slug: "zrxb",
+				showInDock: true,
+			},
+		];
+	}
+
+	return [];
+}
 
 export const allApps = apps;

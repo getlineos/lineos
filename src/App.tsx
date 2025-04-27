@@ -1,24 +1,23 @@
-import { Route, Routes } from "react-router";
-import "@/assets/css/index.css";
-import { Provider } from "react-redux";
-import { store } from "./store";
-import wallpaper from "@/assets/img/wallpaper.jpg";
-import Home from "@/pages/home";
-import Launchpad from "@/pages/launchpad";
 import AppWrapper from "@/apps/AppWrapper";
 import Loop from "@/apps/loop";
-import Notes from "@/apps/notes";
 import Music from "@/apps/music";
-import Dock from "@/components/Dock";
 import Store from "@/apps/store";
+import "@/assets/css/index.css";
+import wallpaper from "@/assets/img/wallpaper.jpg";
+import Dock from "@/components/Dock";
+import Home from "@/pages/home";
+import Launchpad from "@/pages/launchpad";
+import { useEffect } from "react";
+import { Provider } from "react-redux";
+import { Route, Routes } from "react-router";
+import DynamicApp from "./apps/[slug]";
+import ZrxbPage from "./apps/zrxb";
 import { Toaster } from "./components/ui/toaster";
 import { initializeInstalledApps } from "./config/apps";
-import { useEffect } from "react";
-import DynamicApp from "./apps/[slug]";
-
+import { store } from "./store";
 export default function App() {
 	useEffect(() => {
-		initializeInstalledApps();
+		initializeInstalledApps(true);
 	}, []);
 
 	return (
@@ -32,9 +31,9 @@ export default function App() {
 					<Route path="/launchpad" element={<Launchpad />} />
 					<Route path="/" element={<AppWrapper />}>
 						<Route path="loop" element={<Loop />} />
-						<Route path="notes" element={<Notes />} />
 						<Route path="music" element={<Music />} />
 						<Route path="store/*" element={<Store />} />
+						<Route path="zrxb" element={<ZrxbPage />} />
 						<Route path="/:slug" element={<DynamicApp />} />
 					</Route>
 					<Route path="*" element={<Home />} />
