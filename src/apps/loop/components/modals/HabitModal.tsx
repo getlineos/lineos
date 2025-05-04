@@ -87,7 +87,9 @@ export default function HabitModal({
 				{habit.description && (
 					<div className="space-y-2">
 						<h4 className="font-medium">Reminders</h4>
-						<p className="text-gray-600">{habit.description}</p>
+						<p className="text-gray-600 whitespace-break-spaces">
+							{habit.description}
+						</p>
 					</div>
 				)}
 			</div>
