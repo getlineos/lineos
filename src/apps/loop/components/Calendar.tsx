@@ -1,16 +1,23 @@
+import { cn } from "@/utils";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
+import { getDailyMinutesSpent } from "../utils";
+import { getGoalMinutes } from "../utils/storage";
 
 interface CalendarProps {
 	currentDate: string;
 	onDateChange: (date: string) => void;
+	progress?: { [key: string]: number };
 }
 
 export default function Calendar({ currentDate, onDateChange }: CalendarProps) {
 	const currentDayjs = dayjs(currentDate);
 	const [selectedMonth, setSelectedMonth] = useState(currentDayjs.month());
 	const [selectedYear, setSelectedYear] = useState(currentDayjs.year());
+	const [dailyMinutesSpent, setDailyMinutesSpent] = useState<
+		Record<string, number>
+	>({});
 
 	const getDaysInMonth = (month: number, year: number) => {
 		return dayjs().year(year).month(month).daysInMonth();
@@ -40,6 +47,25 @@ export default function Calendar({ currentDate, onDateChange }: CalendarProps) {
 	};
 
 	const today = dayjs().format("YYYY-MM-DD");
+	const goalMinutes = getGoalMinutes();
+
+	useEffect(() => {
+		fetchDayData();
+
+		const handleTimerStop = () => {
+			fetchDayData();
+		};
+
+		window.addEventListener("habitTimerStop", handleTimerStop);
+
+		return () => {
+			window.removeEventListener("habitTimerStop", handleTimerStop);
+		};
+	}, [currentDate]);
+
+	const fetchDayData = () => {
+		setDailyMinutesSpent(getDailyMinutesSpent(currentDate));
+	};
 
 	return (
 		<div className="bg-white p-6 rounded-2xl">
@@ -86,22 +112,51 @@ export default function Calendar({ currentDate, onDateChange }: CalendarProps) {
 						.format("YYYY-MM-DD");
 
 					return (
-						<button
-							key={day}
-							onClick={() => handleDateSelect(day)}
-							className={`p-2 rounded-full ${
-								currentDateString === currentDate
-									? "bg-blue-500 text-white"
-									: currentDateString === today
-									? "bg-blue-100"
-									: "hover:bg-gray-100"
-							}`}
-						>
-							{day}
-						</button>
+						<DayCell
+							key={i}
+							day={day}
+							isSelected={currentDateString === currentDate}
+							isToday={currentDateString === today}
+							progress={
+								((dailyMinutesSpent[currentDateString] || 0) / goalMinutes) *
+								100
+							}
+							onDateChange={handleDateSelect}
+						/>
 					);
 				})}
 			</div>
 		</div>
 	);
 }
+
+type DayCellProps = {
+	day: number;
+	progress: number;
+	isSelected: boolean;
+	onDateChange: (day: number) => void;
+	isToday: boolean;
+};
+
+const DayCell = ({
+	day,
+	progress,
+	isSelected,
+	onDateChange,
+	isToday,
+}: DayCellProps) => {
+	return (
+		<button
+			onClick={() => onDateChange(day)}
+			className={cn(
+				"p-2 rounded-full relative overflow-hidden bg-progress-gradient",
+				isSelected && "bg-blue-500 text-white",
+				isToday && !isSelected && "bg-blue-100",
+				!isSelected && !isToday && "hover:bg-gray-100"
+			)}
+			style={{ "--progress": `${progress}%` } as React.CSSProperties}
+		>
+			{day}
+		</button>
+	);
+};

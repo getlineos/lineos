@@ -1,3 +1,5 @@
+import { getStoredData } from "./storage";
+
 export const formatTime = (
 	minutes: number,
 	format: "hms" | "hm" | "ms" = "hms"
@@ -30,4 +32,18 @@ export const formatTime = (
 	}
 
 	return `${mins}m ${secs}s`;
+};
+
+export const getDailyMinutesSpent = (currentDate: string) => {
+	const [year, month] = currentDate.split("-");
+	const { timerData } = getStoredData();
+
+	const totalMinutes = timerData
+		?.filter((timer) => timer.date.startsWith(`${year}-${month}`))
+		.reduce((acc, timer) => {
+			acc[timer.date] = (acc[timer.date] || 0) + (timer.totalMinutes || 0);
+			return acc;
+		}, {} as Record<string, number>);
+
+	return totalMinutes;
 };

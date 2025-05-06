@@ -36,4 +36,5 @@ export interface LocalStorageData {
 	timeBlocks: TimeBlock[];
 	habits: HabitT[];
 	timerData: TimerData[];
+	goalMinutes: number;
 }

@@ -89,3 +89,8 @@ export const toggleHabitCompletion = (habitId: string, date: string) => {
 		});
 	}
 };
+
+export const getGoalMinutes = () => {
+	const data = getStoredData();
+	return data.goalMinutes;
+};
