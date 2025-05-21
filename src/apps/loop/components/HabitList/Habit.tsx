@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { BsClock } from "react-icons/bs";
 import { CiCircleCheck } from "react-icons/ci";
 import { LuCirclePause } from "react-icons/lu";
+import { cn } from "@/utils";
 
 const emitTimerStopEvent = () => {
 	const event = new CustomEvent("habitTimerStop");
@@ -163,6 +164,7 @@ export default function Habit({
 								? "none"
 								: "1px solid rgba(0, 0, 0, 0.1)",
 					}}
+					className={cn({ "bg-green-500 text-white !border-0": isCompleted })}
 				>
 					<div
 						className={`absolute inset-y-0 left-0 transition-[width] duration-1000 linear`}
