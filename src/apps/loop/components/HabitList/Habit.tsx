@@ -1,4 +1,3 @@
-import { Button } from "antd";
 import { HabitT, TimerData } from "@/apps/loop/types";
 import { formatTime } from "@/apps/loop/utils";
 import {
@@ -11,6 +10,7 @@ import { BsClock } from "react-icons/bs";
 import { CiCircleCheck } from "react-icons/ci";
 import { LuCirclePause } from "react-icons/lu";
 import { cn } from "@/utils";
+import { Button } from "@/components/ui/button";
 
 const emitTimerStopEvent = () => {
 	const event = new CustomEvent("habitTimerStop");
@@ -152,19 +152,9 @@ export default function Habit({
 				</div>
 			</div>
 			{habit.goal?.unit === "Mins" ? (
-				<Button
+				<TimerButton
+					isCompleted={isCompleted}
 					onClick={(e) => handleTimerClick(e, habit)}
-					type={activeTimer?.habitId === habit.id ? "primary" : "default"}
-					style={{
-						position: "relative",
-						overflow: "hidden",
-						width: "100px",
-						border:
-							activeTimer?.habitId === habit.id
-								? "none"
-								: "1px solid rgba(0, 0, 0, 0.1)",
-					}}
-					className={cn({ "bg-green-500 text-white !border-0": isCompleted })}
 				>
 					<div
 						className={`absolute inset-y-0 left-0 transition-[width] duration-1000 linear`}
@@ -204,24 +194,38 @@ export default function Habit({
 							</div>
 						)}
 					</div>
-				</Button>
+				</TimerButton>
 			) : (
-				<Button
+				<TimerButton
+					isCompleted={isCompleted}
 					onClick={(e) => handleDoneClick(e, habit.id)}
-					type={isCompleted ? "primary" : "default"}
-					className={isCompleted ? "bg-green-500" : ""}
-					style={{
-						border: isCompleted ? "none" : "1px solid rgba(0, 0, 0, 0.1)",
-						width: 100,
-						display: "flex",
-						alignItems: "center",
-						justifyContent: "center",
-					}}
 				>
-					<CiCircleCheck className="w-5 h-5" />
+					<CiCircleCheck className="w-8 h-8" />
 					Done
-				</Button>
+				</TimerButton>
 			)}
 		</div>
 	);
 }
+
+const TimerButton = ({
+	children,
+	onClick,
+	isCompleted,
+}: {
+	children: React.ReactNode;
+	isCompleted: boolean;
+	onClick: (e: React.MouseEvent) => void;
+}) => {
+	return (
+		<Button
+			variant="outline"
+			className={cn("relative overflow-hidden w-[100px]", {
+				"bg-green-500 text-white border-0": isCompleted,
+			})}
+			onClick={onClick}
+		>
+			{children}
+		</Button>
+	);
+};
