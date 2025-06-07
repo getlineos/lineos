@@ -6,6 +6,10 @@ body {
 	font-family: "Inter", "Geist", sans-serif;
 }
 
+.w-app-screen {
+	width: calc(100vw - 65px);
+}
+
 @layer utilities {
 	.text-balance {
 		text-wrap: balance;
@@ -16,6 +20,14 @@ body {
 			rgba(59, 130, 246, 0.2) var(--progress),
 			transparent var(--progress)
 		);
+	}
+	.scrollbar-hide::-webkit-scrollbar {
+		display: none;
+	}
+
+	.scrollbar-hide {
+		-ms-overflow-style: none;
+		scrollbar-width: none;
 	}
 }
 

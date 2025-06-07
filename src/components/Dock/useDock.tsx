@@ -1,14 +1,26 @@
-import { MutableRefObject, useRef } from "react";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { apps } from "../../config/apps";
 
 export default function useDock() {
+	const [initialDockHeight, setInitialDockHeight] = useState(0);
+
 	const wrapperRef =
 		useRef<HTMLDivElement>() as MutableRefObject<HTMLDivElement>;
+	const dockApps = apps.filter((app) => app.showInDock).slice(0, 12);
 
-	const dockApps = apps.filter((app) => app.showInDock);
+	useEffect(() => {
+		if (wrapperRef.current) {
+			setInitialDockHeight(wrapperRef.current.parentElement?.clientHeight || 0);
+		}
+	}, [wrapperRef]);
 
 	const onItemsMouseEnter = (itemIndex: number) => {
-		const expandSize = 7;
+		const expandSize = 6;
+
+		const parentElement = wrapperRef.current.parentElement;
+		if (parentElement) {
+			parentElement.style.height = parentElement.clientHeight + 50 + "px";
+		}
 
 		const buttonElements = wrapperRef.current
 			.children as HTMLCollectionOf<HTMLDivElement>;
@@ -33,7 +45,12 @@ export default function useDock() {
 	};
 
 	const onItemsMouseLeave = (itemIndex: number) => {
-		const unexpandSize = 4;
+		const unexpandSize = 3.4375;
+
+		const parentElement = wrapperRef.current.parentElement;
+		if (parentElement) {
+			parentElement.style.height = `${initialDockHeight}px`;
+		}
 
 		const buttonElements = wrapperRef.current
 			.children as HTMLCollectionOf<HTMLDivElement>;

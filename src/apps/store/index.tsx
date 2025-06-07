@@ -125,7 +125,7 @@ const Header = () => {
 
 	return (
 		<div>
-			<header className="fixed w-[calc(100%-256px)] z-50 bg-white p-4 flex items-center justify-between border-b border-gray-200">
+			<header className="fixed w-[calc(100%-321px)] z-50 bg-white p-4 flex items-center justify-between border-b border-gray-200">
 				<h1 className="text-2xl font-bold">{getPageTitle(path)}</h1>
 				<div className="flex items-center gap-4">
 					<button className="text-gray-500 hover:text-gray-700 cursor-pointer">

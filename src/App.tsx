@@ -8,15 +8,17 @@ import Dock from "@/components/Dock";
 import Home from "@/pages/home";
 import Launchpad from "@/pages/launchpad";
 import { useEffect } from "react";
-import { Route, Routes } from "react-router";
+import { Route, Routes, useLocation } from "react-router";
 import DynamicApp from "./apps/[slug]";
 import { useAuth } from "./apps/store/hooks/useAuth";
-import ZrxbPage from "./apps/zrxb";
+import Menubar from "./components/Menubar";
 import { Toaster } from "./components/ui/toaster";
 import { initializeInstalledApps } from "./config/apps";
 import ResetPage from "./pages/reset";
 
 export default function App() {
+	const location = useLocation();
+
 	useAuth();
 	useEffect(() => {
 		initializeInstalledApps();
@@ -27,18 +29,20 @@ export default function App() {
 			className="relative h-screen !bg-no-repeat !bg-cover"
 			style={{ background: `url(${wallpaper})` }}
 		>
-			<Routes>
-				<Route path="/" element={<Home />} />
-				<Route path="/launchpad" element={<Launchpad />} />
-				<Route path="/reset" element={<ResetPage />} />
-				<Route path="/" element={<AppWrapper />}>
-					<Route path="loop" element={<Loop />} />
-					<Route path="music" element={<Music />} />
-					<Route path="store/*" element={<Store />} />
-					<Route path="zrxb" element={<ZrxbPage />} />
-					<Route path="/:slug" element={<DynamicApp />} />
-				</Route>
-			</Routes>
+			{location.pathname === "/" && <Menubar />}
+			<div className="ml-[65px]">
+				<Routes>
+					<Route path="/" element={<Home />} />
+					<Route path="/launchpad" element={<Launchpad />} />
+					<Route path="/reset" element={<ResetPage />} />
+					<Route path="/" element={<AppWrapper />}>
+						<Route path="loop" element={<Loop />} />
+						<Route path="music" element={<Music />} />
+						<Route path="store/*" element={<Store />} />
+						<Route path="/:slug" element={<DynamicApp />} />
+					</Route>
+				</Routes>
+			</div>
 			<Dock />
 			<Toaster />
 		</div>

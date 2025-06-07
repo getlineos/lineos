@@ -1,5 +1,6 @@
 import wallpaper from "@/assets/img/wallpaper.jpg";
 import { RootState } from "@/store/persistence";
+import { cn } from "@/utils";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
@@ -8,7 +9,6 @@ export default function Launchpad() {
 	const navigate = useNavigate();
 	const [currentPage, setCurrentPage] = useState(0);
 	const apps = useSelector((state: RootState) => state.installedApps?.apps);
-	console.log("------apps", apps);
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
@@ -21,11 +21,7 @@ export default function Launchpad() {
 		return () => window.removeEventListener("keydown", handleKeyDown);
 	}, [navigate]);
 
-	const handleBackgroundClick = () => {
-		navigate("/");
-	};
-
-	const ITEMS_PER_PAGE = 35;
+	const ITEMS_PER_PAGE = 28;
 	const totalPages = Math.ceil(apps.length / ITEMS_PER_PAGE);
 	const currentApps = apps
 		.filter((app) => app.showInLaunchpad !== false)
@@ -34,7 +30,6 @@ export default function Launchpad() {
 	return (
 		<div
 			className="fixed inset-0 z-50"
-			onClick={handleBackgroundClick}
 			style={{
 				backgroundImage: `url(${wallpaper})`,
 				backgroundSize: "cover",
@@ -42,24 +37,18 @@ export default function Launchpad() {
 			}}
 		>
 			<div className="absolute inset-0 backdrop-blur-md bg-black/5">
-				<div className="flex flex-col items-center justify-between h-full">
-					<div
-						className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-x-4 sm:gap-x-8 lg:gap-x-12 xl:gap-x-16 gap-y-4 sm:gap-y-6 lg:gap-y-8 p-4 sm:p-8 lg:p-16 xl:p-24 pb-12 w-full max-w-[1400px] mx-auto overflow-y-auto"
-						onClick={(e) => e.stopPropagation()}
-					>
+				<div className="flex flex-col items-center justify-center h-screen w-screen relative">
+					<div className="grid grid-cols-6 xl:grid-cols-7 gap-x-16 mx-auto overflow-y-auto h-[calc(100vh-158px)] scrollbar-hide">
 						{currentApps.map((app) => (
 							<div
 								key={app.name}
-								className="flex flex-col items-center gap-1 sm:gap-2 cursor-default"
-								onClick={(e) => {
-									e.stopPropagation();
-									navigate(`/${app.slug}`);
-								}}
+								className="flex flex-col items-center gap-2 cursor-default"
+								onClick={() => navigate(`/${app.slug}`)}
 							>
 								<img
 									src={app.icon}
 									alt={app.name}
-									className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24"
+									className="w-12 h-12 lg:w-24 lg:h-24"
 								/>
 								<span className="text-white text-xs sm:text-sm text-center">
 									{app.name}
@@ -69,27 +58,38 @@ export default function Launchpad() {
 					</div>
 
 					{totalPages > 1 && (
-						<div
-							className="flex gap-2 h-8 sm:h-12"
-							onClick={(e) => e.stopPropagation()}
-						>
-							{Array(totalPages)
-								.fill(null)
-								.map((_, index) => (
-									<button
-										key={index}
-										className={`w-2 h-2 rounded-full transition-all duration-200 ${
-											currentPage === index
-												? "bg-white w-4"
-												: "bg-white/50 hover:bg-white/70"
-										}`}
-										onClick={() => setCurrentPage(index)}
-									/>
-								))}
-						</div>
+						<PageDots
+							totalPages={totalPages}
+							currentPage={currentPage}
+							setCurrentPage={setCurrentPage}
+						/>
 					)}
 				</div>
 			</div>
 		</div>
 	);
 }
+
+const PageDots = ({ totalPages, currentPage, setCurrentPage }: any) => {
+	return (
+		<div
+			className="flex gap-3 h-8 sm:h-12 absolute bottom-0 left-1/2 -translate-x-1/2"
+			onClick={(e) => e.stopPropagation()}
+		>
+			{Array(totalPages)
+				.fill(null)
+				.map((_, index) => (
+					<button
+						key={index}
+						className={cn(
+							"w-2 h-2 rounded-full transition-all duration-200",
+							currentPage === index
+								? "bg-white"
+								: "bg-white/50 hover:bg-white/70"
+						)}
+						onClick={() => setCurrentPage(index)}
+					/>
+				))}
+		</div>
+	);
+};
