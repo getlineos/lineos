@@ -118,7 +118,7 @@ export default function Calendar({ currentDate, onDateChange }: CalendarProps) {
 							isSelected={currentDateString === currentDate}
 							isToday={currentDateString === today}
 							progress={
-								((dailyMinutesSpent[currentDateString] || 0) / goalMinutes) *
+								((dailyMinutesSpent?.[currentDateString] || 0) / goalMinutes) *
 								100
 							}
 							onDateChange={handleDateSelect}
