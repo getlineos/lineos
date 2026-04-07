@@ -160,6 +160,8 @@ export const apps: AppConfig[] = [
 		showInDock: true,
 		showInLaunchpad: true,
 		slug: "music",
+		url: getStandaloneAppUrl("music"),
+		sandbox: "allow-same-origin allow-scripts allow-forms",
 	},
 	{
 		name: "App Store",
@@ -380,8 +382,15 @@ export const getInstalledApps = () => {
 	return [...apps, ...installedApps];
 };
 
+function isLocalDevHost() {
+	return (
+		window.location.hostname === "localhost" ||
+		window.location.hostname === "127.0.0.1"
+	);
+}
+
 export function getDevApps() {
-	if (window.location.hostname === "localhost") {
+	if (isLocalDevHost()) {
 		return [
 			{
 				name: "Zrxb",
