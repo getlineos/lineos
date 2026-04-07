@@ -1,9 +1,8 @@
 import AppWrapper from "@/apps/AppWrapper";
-import Loop from "@/apps/loop";
-import Music from "@/apps/music";
 import Store from "@/apps/store";
 import "@/assets/css/index.css";
 import wallpaper from "@/assets/img/wallpaper.jpg";
+import AppLauncher from "@/components/AppLauncher";
 import Dock from "@/components/Dock";
 import Home from "@/pages/home";
 import Launchpad from "@/pages/launchpad";
@@ -36,13 +35,12 @@ export default function App() {
 					<Route path="/launchpad" element={<Launchpad />} />
 					<Route path="/reset" element={<ResetPage />} />
 					<Route path="/" element={<AppWrapper />}>
-						<Route path="loop" element={<Loop />} />
-						<Route path="music" element={<Music />} />
 						<Route path="store/*" element={<Store />} />
 						<Route path="/:slug" element={<DynamicApp />} />
 					</Route>
 				</Routes>
 			</div>
+			<AppLauncher />
 			<Dock />
 			<Toaster />
 		</div>

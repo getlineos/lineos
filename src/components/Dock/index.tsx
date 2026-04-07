@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router";
+import { openApp } from "@/utils/openApp";
 import useDock from "./useDock";
 
 export default function Dock() {
@@ -24,10 +25,19 @@ export default function Dock() {
 							onMouseLeave={() => onItemsMouseLeave(idx)}
 							onClick={(e) => {
 								e.stopPropagation();
-								navigate(`/${slug}`);
+								openApp(navigate, { name, icon, slug });
 							}}
 						>
-							<img src={icon} className="select-none w-full" />
+							<img
+								src={icon}
+								className={[
+									"select-none w-full origin-center",
+									(slug === "expensify" || slug === "compressly") &&
+										"scale-[0.8]",
+								]
+									.filter(Boolean)
+									.join(" ")}
+							/>
 						</div>
 					))}
 				</div>
