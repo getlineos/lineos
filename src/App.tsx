@@ -1,4 +1,7 @@
 import AppWrapper from "@/apps/AppWrapper";
+import CalendarApp from "@/apps/calendar";
+import CalculatorApp from "@/apps/calculator";
+import NotesApp from "@/apps/notes";
 import Store from "@/apps/store";
 import "@/assets/css/index.css";
 import wallpaper from "@/assets/img/wallpaper.jpg";
@@ -35,6 +38,9 @@ export default function App() {
 					<Route path="/launchpad" element={<Launchpad />} />
 					<Route path="/reset" element={<ResetPage />} />
 					<Route path="/" element={<AppWrapper />}>
+						<Route path="calculator" element={<CalculatorApp />} />
+						<Route path="calendar" element={<CalendarApp />} />
+						<Route path="notes" element={<NotesApp />} />
 						<Route path="store/*" element={<Store />} />
 						<Route path="/:slug" element={<DynamicApp />} />
 					</Route>

@@ -150,7 +150,7 @@ export const apps: AppConfig[] = [
 	{
 		name: "Loop",
 		icon: LoopIcon,
-		showInDock: true,
+		showInDock: false,
 		showInLaunchpad: true,
 		slug: "loop",
 	},
@@ -392,13 +392,6 @@ function isLocalDevHost() {
 export function getDevApps() {
 	if (isLocalDevHost()) {
 		return [
-			{
-				name: "Zrxb",
-				icon: XcodeIcon,
-				showInLaunchpad: true,
-				slug: "zrxb",
-				showInDock: true,
-			},
 			{
 				name: "Expensify",
 				icon: ExpensifyIcon,
