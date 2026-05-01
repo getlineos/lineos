@@ -40,6 +40,9 @@ import StocksIcon from "../assets/img/icons/stocks.png";
 import XcodeIcon from "../assets/img/icons/xcode.png";
 import TrashIcon from "../assets/img/icons/trash.png";
 import LoopIcon from "../assets/img/icons/loop.png";
+import ExpensifyIcon from "../assets/img/icons/expensify.svg";
+import CompresslyIcon from "../assets/img/icons/compressly.svg";
+import devConfig from "../../../apps/dev.config.json";
 import { useNavigate } from "react-router";
 import storage from "@/utils/storage";
 import { store } from "@/store/persistence";
@@ -66,8 +69,26 @@ export const initializeInstalledApps = (forceUpdate?: boolean) => {
 		storage.set("installedApps", apps);
 		store.dispatch(setInstalledApps(apps));
 	} else {
-		store.dispatch(setInstalledApps(installedApps));
+		const mergedApps = [
+			...apps.filter(
+				(defaultApp) =>
+					!installedApps.some(
+						(installedApp: AppConfig) => installedApp.slug === defaultApp.slug,
+					),
+			),
+			...installedApps,
+		];
+		storage.set("installedApps", mergedApps);
+		store.dispatch(setInstalledApps(mergedApps));
 	}
+};
+
+const getStandaloneAppUrl = (appName: string) => {
+	if (import.meta.env.DEV) {
+		return `http://127.0.0.1:${devConfig.proxyPort}/${appName}/`;
+	}
+
+	return `/apps/${appName}/`;
 };
 
 export const apps: AppConfig[] = [
@@ -129,7 +150,7 @@ export const apps: AppConfig[] = [
 	{
 		name: "Loop",
 		icon: LoopIcon,
-		showInDock: true,
+		showInDock: false,
 		showInLaunchpad: true,
 		slug: "loop",
 	},
@@ -139,6 +160,8 @@ export const apps: AppConfig[] = [
 		showInDock: true,
 		showInLaunchpad: true,
 		slug: "music",
+		url: getStandaloneAppUrl("music"),
+		sandbox: "allow-same-origin allow-scripts allow-forms",
 	},
 	{
 		name: "App Store",
@@ -161,6 +184,7 @@ export const apps: AppConfig[] = [
 		showInLaunchpad: true,
 		slug: "calculator",
 	},
+	...getDevApps(),
 	{
 		name: "Contacts",
 		icon: ContactsIcon,
@@ -344,7 +368,6 @@ export const apps: AppConfig[] = [
 		showInLaunchpad: true,
 		slug: "xcode",
 	},
-	...getDevApps(),
 	{
 		name: "Trash",
 		icon: TrashIcon,
@@ -359,15 +382,33 @@ export const getInstalledApps = () => {
 	return [...apps, ...installedApps];
 };
 
+function isLocalDevHost() {
+	return (
+		window.location.hostname === "localhost" ||
+		window.location.hostname === "127.0.0.1"
+	);
+}
+
 export function getDevApps() {
-	if (window.location.hostname === "localhost") {
+	if (isLocalDevHost()) {
 		return [
 			{
-				name: "Zrxb",
-				icon: XcodeIcon,
-				showInLaunchpad: true,
-				slug: "zrxb",
+				name: "Expensify",
+				icon: ExpensifyIcon,
 				showInDock: true,
+				showInLaunchpad: true,
+				slug: "expensify",
+				url: getStandaloneAppUrl("expensify"),
+				sandbox: "allow-same-origin allow-scripts allow-forms",
+			},
+			{
+				name: "Compressly",
+				icon: CompresslyIcon,
+				showInDock: true,
+				showInLaunchpad: true,
+				slug: "compressly",
+				url: getStandaloneAppUrl("compressly"),
+				sandbox: "allow-same-origin allow-scripts allow-forms",
 			},
 		];
 	}

@@ -1,6 +1,7 @@
 import wallpaper from "@/assets/img/wallpaper.jpg";
 import { RootState } from "@/store/persistence";
 import { cn } from "@/utils";
+import { openApp } from "@/utils/openApp";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
@@ -41,10 +42,10 @@ export default function Launchpad() {
 					<div className="grid grid-cols-6 xl:grid-cols-7 gap-x-16 mx-auto overflow-y-auto h-[calc(100vh-158px)] scrollbar-hide">
 						{currentApps.map((app) => (
 							<div
-								key={app.name}
-								className="flex flex-col items-center gap-2 cursor-default"
-								onClick={() => navigate(`/${app.slug}`)}
-							>
+							key={app.name}
+							className="flex flex-col items-center gap-2 cursor-default"
+							onClick={() => openApp(navigate, app)}
+						>
 								<img
 									src={app.icon}
 									alt={app.name}
