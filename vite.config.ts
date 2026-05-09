@@ -7,7 +7,13 @@ export default defineConfig({
 	plugins: [react(), tsconfigPaths()],
 	server: {
 		host: "127.0.0.1",
-		port: devConfig.corePort,
+		port: devConfig.lineosPort,
 		strictPort: true,
+		proxy: {
+			"/api": {
+				target: `http://127.0.0.1:${process.env.CORE_API_PORT ?? 5177}`,
+				changeOrigin: true,
+			},
+		},
 	},
 });

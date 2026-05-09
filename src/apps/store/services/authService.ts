@@ -1,59 +1,43 @@
-import { supabase } from "@/lib/supabase";
-import { User } from "@supabase/supabase-js";
+import { apiRequest, toJsonBody } from "@/lib/api";
+import { Session, User } from "@/types/auth";
 import { profileService } from "./profileService";
-import { Profile, DeveloperStatus } from "./profileService";
+import { Profile } from "./profileService";
 
 export const authService = {
 	async signUp(email: string, password: string) {
-		const { data, error } = await supabase.auth.signUp({
-			email,
-			password,
+		return apiRequest<{ user: User; session: Session }>("/api/auth/signup", {
+			method: "POST",
+			body: toJsonBody({ email, password }),
 		});
-
-		if (error) throw error;
-		return data;
 	},
 
 	async signIn(email: string, password: string) {
-		const { data, error } = await supabase.auth.signInWithPassword({
-			email,
-			password,
+		return apiRequest<{ user: User; session: Session }>("/api/auth/signin", {
+			method: "POST",
+			body: toJsonBody({ email, password }),
 		});
-
-		if (error) throw error;
-		return data;
 	},
 
 	async signInWithProvider(provider: "google" | "github" | "apple") {
-		const { data, error } = await supabase.auth.signInWithOAuth({
-			provider,
-			options: {
-				redirectTo: `${window.location.origin}/auth/callback`,
-			},
-		});
-
-		if (error) throw error;
-		return data;
+		throw new Error(`${provider} sign-in is not configured for PostgreSQL auth`);
 	},
 
 	async signOut() {
-		const { error } = await supabase.auth.signOut();
-		if (error) throw error;
+		await apiRequest<{ ok: boolean }>("/api/auth/signout", {
+			method: "POST",
+		});
 	},
 
 	async getSession() {
-		const { data, error } = await supabase.auth.getSession();
-		if (error) throw error;
+		const data = await apiRequest<{ session: Session | null }>("/api/auth/session");
 		return data.session;
 	},
 
 	async getUser() {
-		const {
-			data: { user },
-			error,
-		} = await supabase.auth.getUser();
-		if (error) throw error;
-		return user;
+		const session = await this.getSession();
+		return session && typeof session === "object" && "user" in session
+			? (session.user as User)
+			: null;
 	},
 
 	async getProfile(user: User) {
@@ -61,22 +45,6 @@ export const authService = {
 			const profile = await profileService.getProfile(user.id);
 			return profile;
 		} catch (error) {
-			// If profile doesn't exist, create a new one
-			if (error instanceof Error && error.message.includes("not found")) {
-				const { data: profile, error: profileError } = await supabase
-					.from("profiles")
-					.upsert({
-						id: user.id,
-						first_name: user.user_metadata.first_name,
-						last_name: user.user_metadata.last_name,
-						avatar_url: user.user_metadata.avatar_url,
-						developer_status: "not_applied" as DeveloperStatus,
-					})
-					.select()
-					.single();
-				if (profileError) throw profileError;
-				return profile;
-			}
 			throw error;
 		}
 	},

@@ -1,0 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum PricingModel {
+  free
+  paid
+  freemium
+  subscription
+
+  @@map("pricing_model")
+}
+
+enum ReleaseType {
+  immediate
+  manual
+  scheduled
+
+  @@map("release_type")
+}
+
+enum AgeRating {
+  four_plus      @map("4+")
+  nine_plus      @map("9+")
+  twelve_plus    @map("12+")
+  seventeen_plus @map("17+")
+
+  @@map("age_rating")
+}
+
+enum AppStatus {
+  draft
+  pending_review
+  approved
+  rejected
+
+  @@map("app_status")
+}
+
+model Users {
+  id            Int         @id @default(autoincrement())
+  email         String      @unique
+  password_hash String
+  password_salt String
+  created_at    DateTime?   @default(now()) @db.Timestamptz(6)
+  profile       Profile?
+  apps          App[]
+  reviews       AppReview[]
+
+  @@map("users")
+}
+
+model Profile {
+  id               Int       @id
+  created_at       DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime? @default(now()) @db.Timestamptz(6)
+  developer_status String?   @default("not_applied") @db.VarChar(20)
+  first_name       String?
+  last_name        String?
+  avatar_url       String?
+  user             Users     @relation(fields: [id], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model App {
+  id                     Int            @id @default(autoincrement())
+  user_id                Int
+  name                   String         @db.VarChar(100)
+  subtitle               String?        @db.VarChar(100)
+  description            String
+  primary_category       String         @db.VarChar(50)
+  subcategory            String?        @db.VarChar(50)
+  keywords               String[]       @default([])
+  support_url            String
+  privacy_policy_url     String
+  contact_email          String
+  app_url                String         @default("")
+  icon_url               String         @default("")
+  pricing_model          PricingModel
+  price                  Decimal?       @db.Decimal(10, 2)
+  currency               String?        @db.VarChar(3)
+  release_type           ReleaseType
+  scheduled_release_date DateTime?      @db.Timestamptz(6)
+  is_preorder            Boolean?       @default(false)
+  age_rating             AgeRating
+  content_descriptors    String[]
+  review_notes           String?
+  status                 AppStatus?     @default(draft)
+  created_at             DateTime?      @default(now()) @db.Timestamptz(6)
+  updated_at             DateTime?      @default(now()) @db.Timestamptz(6)
+  slug                   String         @unique
+  user                   Users          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  assets                 AppAsset[]
+  territories            AppTerritory[]
+  reviews                AppReview[]
+
+  @@map("apps")
+}
+
+model AppAsset {
+  id         Int       @id @default(autoincrement())
+  app_id     Int
+  asset_type String    @db.VarChar(20)
+  file_path  String
+  file_size  Int
+  width      Int?
+  height     Int?
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  app        App       @relation(fields: [app_id], references: [id], onDelete: Cascade)
+
+  @@map("app_assets")
+}
+
+model AppTerritory {
+  id             Int       @id @default(autoincrement())
+  app_id         Int
+  territory_code String    @db.VarChar(2)
+  created_at     DateTime? @default(now()) @db.Timestamptz(6)
+  app            App       @relation(fields: [app_id], references: [id], onDelete: Cascade)
+
+  @@unique([app_id, territory_code])
+  @@map("app_territories")
+}
+
+model AppReview {
+  id          Int       @id @default(autoincrement())
+  app_id      Int
+  reviewer_id Int
+  status      AppStatus
+  feedback    String?
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime? @default(now()) @db.Timestamptz(6)
+  app         App       @relation(fields: [app_id], references: [id], onDelete: Cascade)
+  reviewer    Users     @relation(fields: [reviewer_id], references: [id], onDelete: Cascade)
+
+  @@map("app_reviews")
+}

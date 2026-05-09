@@ -1,7 +1,9 @@
 import { useAppSelector } from "@/store/hooks";
 import { useGetProfileQuery } from "@/store/slices/profileApi";
 import { cn } from "@/utils";
+import type { ElementType } from "react";
 import {
+	Apple,
 	ChartNoAxesColumnIncreasing,
 	CircleCheckBig,
 	CopyCheck,
@@ -12,6 +14,7 @@ import {
 	Gift,
 	Grid,
 	Heart,
+	X,
 	Monitor,
 	Star,
 	Users,
@@ -21,21 +24,21 @@ import { Link, useLocation } from "react-router";
 
 export default function Sidebar() {
 	const { user } = useAppSelector((state) => state.auth);
-	const { data: profile } = useGetProfileQuery(user?.id || "", {
+	const { data: profile } = useGetProfileQuery(user?.id ?? 0, {
 		skip: !user?.id,
 	});
 	const isDeveloper = user && profile?.developer_status === "approved";
 
 	return (
-		<div className="w-64 bg-white border-r border-gray-200">
-			<Link to="/store" className="p-4 flex items-center gap-2">
-				<div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-					<span className="text-white text-xl font-bold">A</span>
+		<aside className="flex w-72 shrink-0 flex-col border-r border-black/10 bg-white/65 backdrop-blur-2xl">
+			<Link to="/store" className="flex items-center gap-3 px-5 py-5">
+				<div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[#0071e3] text-white shadow-sm">
+					<Apple className="h-6 w-6 fill-current" />
 				</div>
-				<span className="font-semibold text-lg">App Store</span>
+				<span className="text-lg font-semibold text-[#1d1d1f]">App Store</span>
 			</Link>
 
-			<nav className="mt-4 px-2">
+			<nav className="flex-1 px-3 pb-4">
 				<div className="space-y-1">
 					<div>
 						<NavLink to="/store" icon={Star} text="Discover" />
@@ -44,9 +47,9 @@ export default function Sidebar() {
 						<NavLink to="#" icon={Download} text="Updates" />
 					</div>
 					<div>
-						<div className="py-2">
-							<div className="h-px bg-gray-200 my-2"></div>
-							<h3 className="px-3 text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
+						<div className="py-3">
+							<div className="my-2 h-px bg-black/10" />
+							<h3 className="mb-1 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#86868b]">
 								Your Library
 							</h3>
 						</div>
@@ -62,7 +65,7 @@ export default function Sidebar() {
 			</nav>
 
 			{!isDeveloper ? <PromoSection /> : null}
-		</div>
+		</aside>
 	);
 }
 
@@ -72,7 +75,7 @@ const NavLink = ({
 	text,
 }: {
 	to: string;
-	icon: React.ElementType;
+	icon: ElementType;
 	text: string;
 }) => {
 	const location = useLocation();
@@ -82,11 +85,11 @@ const NavLink = ({
 		<Link
 			to={to}
 			className={cn(
-				"w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100",
-				{ "bg-blue-500 hover:bg-blue-600 text-white": isActive }
+				"flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-[#424245] transition hover:bg-black/5",
+				{ "bg-[#0071e3] text-white shadow-sm hover:bg-[#0071e3]": isActive }
 			)}
 		>
-			<Icon className="h-5 w-5" />
+			<Icon className="h-[18px] w-[18px]" />
 			<span>{text}</span>
 		</Link>
 	);
@@ -95,9 +98,9 @@ const NavLink = ({
 const DevSection = () => {
 	return (
 		<div>
-			<div className="py-2">
-				<div className="h-px bg-gray-200 my-2"></div>
-				<h3 className="px-3 text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
+			<div className="py-3">
+				<div className="my-2 h-px bg-black/10" />
+				<h3 className="mb-1 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#86868b]">
 					Developer
 				</h3>
 			</div>
@@ -114,31 +117,22 @@ const DevSection = () => {
 
 const PromoSection = () => {
 	return (
-		<div className="mx-4 mt-4 mb-4">
-			<div className="relative rounded-xl overflow-hidden bg-gradient-to-r from-pink-500 to-purple-600 p-4 text-white">
-				<button className="absolute top-2 right-2 text-white/80 hover:text-white">
+		<div className="mx-4 mb-5">
+			<div className="relative overflow-hidden rounded-2xl bg-[#1d1d1f] p-4 text-white shadow-sm">
+				<div className="absolute inset-x-0 top-0 h-1 bg-[#0071e3]" />
+				<button className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full text-white/70 transition hover:bg-white/10 hover:text-white">
 					<span className="sr-only">Close</span>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="16"
-						height="16"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						strokeWidth="2"
-						strokeLinecap="round"
-						strokeLinejoin="round"
-					>
-						<line x1="18" y1="6" x2="6" y2="18"></line>
-						<line x1="6" y1="6" x2="18" y2="18"></line>
-					</svg>
+					<X className="h-4 w-4" />
 				</button>
-				<h3 className="text-xl font-bold mb-1">1 Month</h3>
-				<h3 className="text-xl font-bold mb-1">Apple Music</h3>
-				<p className="text-lg font-medium mb-1">subscribe</p>
-				<p className="text-lg font-medium mb-4">for Free</p>
-				<button className="w-full bg-white text-purple-700 rounded-full py-2 font-medium text-sm">
-					Get Subscribe
+				<p className="mb-2 text-xs font-semibold uppercase tracking-[0.1em] text-white/55">
+					Featured offer
+				</p>
+				<h3 className="mb-1 text-xl font-semibold">Apple Music</h3>
+				<p className="mb-4 max-w-44 text-sm leading-5 text-white/70">
+					Enjoy one month free with your LineOS account.
+				</p>
+				<button className="w-full rounded-full bg-white py-2 text-sm font-semibold text-[#0071e3] transition hover:bg-white/90">
+					Try Free
 				</button>
 			</div>
 		</div>

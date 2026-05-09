@@ -1,203 +1,136 @@
-import { supabase } from "@/lib/supabase";
+import { apiRequest, toJsonBody } from "@/lib/api";
 import { Database } from "@/types/database";
 
 export const appStoreRepository = {
 	async createApp(
 		appData: Omit<Database["public"]["Tables"]["apps"]["Insert"], "user_id">
 	) {
-		const { data, error } = await supabase
-			.from("apps")
-			.insert([
-				{ ...appData, user_id: (await supabase.auth.getUser()).data.user?.id },
-			])
-			.select()
-			.single();
-
-		if (error) throw error;
-		return data;
+		return apiRequest<Database["public"]["Tables"]["apps"]["Row"]>("/api/apps", {
+			method: "POST",
+			body: toJsonBody(appData),
+		});
 	},
 
 	async getAppsByUserId() {
-		const { data, error } = await supabase
-			.from("apps")
-			.select("*")
-			.order("created_at", { ascending: false });
-
-		if (error) throw error;
-		return data;
+		return apiRequest<Database["public"]["Tables"]["apps"]["Row"][]>("/api/apps");
 	},
 
-	async getAppById(id: string) {
-		const { data, error } = await supabase
-			.from("apps")
-			.select("*")
-			.eq("id", id)
-			.single();
-
-		if (error) throw error;
-		return data;
+	async getAppById(id: number) {
+		return apiRequest<Database["public"]["Tables"]["apps"]["Row"]>(
+			`/api/apps/${id}`
+		);
 	},
 
 	async updateApp(
-		id: string,
+		id: number,
 		appData: Database["public"]["Tables"]["apps"]["Update"]
 	) {
-		const { data, error } = await supabase
-			.from("apps")
-			.update(appData)
-			.eq("id", id)
-			.select()
-			.single();
-
-		if (error) throw error;
-		return data;
+		return apiRequest<Database["public"]["Tables"]["apps"]["Row"]>(
+			`/api/apps/${id}`,
+			{
+				method: "PATCH",
+				body: toJsonBody(appData),
+			}
+		);
 	},
 
 	// Asset-related operations
 	async uploadAsset(
-		appId: string,
+		appId: number,
 		file: File,
 		assetType: Database["public"]["Tables"]["app_assets"]["Insert"]["asset_type"]
 	) {
-		const fileExt = file.name.split(".").pop();
-		const fileName = `${appId}/${assetType}-${Date.now()}.${fileExt}`;
-		const filePath = `app-assets/${fileName}`;
+		const formData = new FormData();
+		formData.append("file", file);
+		formData.append("appId", String(appId));
+		formData.append("assetType", assetType);
 
-		const { error: uploadError } = await supabase.storage
-			.from("app-assets")
-			.upload(filePath, file);
-
-		if (uploadError) throw uploadError;
-
-		const { data: assetData, error } = await supabase
-			.from("app_assets")
-			.insert([
-				{
-					app_id: appId,
-					asset_type: assetType,
-					file_path: filePath,
-					file_size: file.size,
-				},
-			])
-			.select()
-			.single();
-
-		if (error) throw error;
-		return assetData;
+		return apiRequest<Database["public"]["Tables"]["app_assets"]["Row"]>(
+			"/api/uploads/app-assets",
+			{
+				method: "POST",
+				body: formData,
+			}
+		);
 	},
 
-	async getAppAssets(appId: string) {
-		const { data, error } = await supabase
-			.from("app_assets")
-			.select("*")
-			.eq("app_id", appId);
-
-		if (error) throw error;
-		return data;
+	async getAppAssets(appId: number) {
+		return apiRequest<Database["public"]["Tables"]["app_assets"]["Row"][]>(
+			`/api/apps/${appId}/assets`
+		);
 	},
 
-	async deleteAsset(id: string) {
-		const { data: asset, error: fetchError } = await supabase
-			.from("app_assets")
-			.select("file_path")
-			.eq("id", id)
-			.single();
+	async createAsset(
+		appId: number,
+		assetData: Omit<
+			Database["public"]["Tables"]["app_assets"]["Insert"],
+			"app_id"
+		>
+	) {
+		return apiRequest<Database["public"]["Tables"]["app_assets"]["Row"]>(
+			`/api/apps/${appId}/assets`,
+			{
+				method: "POST",
+				body: toJsonBody(assetData),
+			}
+		);
+	},
 
-		if (fetchError) throw fetchError;
-
-		const { error: deleteError } = await supabase.storage
-			.from("app-assets")
-			.remove([asset.file_path]);
-
-		if (deleteError) throw deleteError;
-
-		const { error } = await supabase.from("app_assets").delete().eq("id", id);
-
-		if (error) throw error;
+	async deleteAsset(id: number) {
+		return apiRequest<{ ok: boolean }>(`/api/assets/${id}`, {
+			method: "DELETE",
+		});
 	},
 
 	// Territory-related operations
-	async addTerritories(appId: string, territoryCodes: string[]) {
-		const { data, error } = await supabase
-			.from("app_territories")
-			.insert(
-				territoryCodes.map((code) => ({
-					app_id: appId,
-					territory_code: code,
-				}))
-			)
-			.select();
-
-		if (error) throw error;
-		return data;
+	async addTerritories(appId: number, territoryCodes: string[]) {
+		return apiRequest<Database["public"]["Tables"]["app_territories"]["Row"][]>(
+			`/api/apps/${appId}/territories`,
+			{
+				method: "POST",
+				body: toJsonBody({ territoryCodes }),
+			}
+		);
 	},
 
-	async getAppTerritories(appId: string) {
-		const { data, error } = await supabase
-			.from("app_territories")
-			.select("*")
-			.eq("app_id", appId);
-
-		if (error) throw error;
-		return data;
+	async getAppTerritories(appId: number) {
+		return apiRequest<Database["public"]["Tables"]["app_territories"]["Row"][]>(
+			`/api/apps/${appId}/territories`
+		);
 	},
 
-	async removeTerritories(appId: string, territoryCodes: string[]) {
-		const { error } = await supabase
-			.from("app_territories")
-			.delete()
-			.eq("app_id", appId)
-			.in("territory_code", territoryCodes);
-
-		if (error) throw error;
+	async removeTerritories(appId: number, territoryCodes: string[]) {
+		return apiRequest<{ ok: boolean }>(`/api/apps/${appId}/territories`, {
+			method: "DELETE",
+			body: toJsonBody({ territoryCodes }),
+		});
 	},
 
 	// Review-related operations
-	async getAppReviews(appId: string) {
-		const { data, error } = await supabase
-			.from("app_reviews")
-			.select("*")
-			.eq("app_id", appId)
-			.order("created_at", { ascending: false });
-
-		if (error) throw error;
-		return data;
+	async getAppReviews(appId: number) {
+		return apiRequest<Database["public"]["Tables"]["app_reviews"]["Row"][]>(
+			`/api/apps/${appId}/reviews`
+		);
 	},
 
 	async createReview(
-		appId: string,
+		appId: number,
 		status: Database["public"]["Tables"]["app_reviews"]["Insert"]["status"],
 		feedback?: string
 	) {
-		const { data, error } = await supabase
-			.from("app_reviews")
-			.insert([
-				{
-					app_id: appId,
-					reviewer_id: (await supabase.auth.getUser()).data.user?.id,
-					status,
-					feedback,
-				},
-			])
-			.select()
-			.single();
-
-		if (error) throw error;
-		return data;
+		return apiRequest<Database["public"]["Tables"]["app_reviews"]["Row"]>(
+			`/api/apps/${appId}/reviews`,
+			{
+				method: "POST",
+				body: toJsonBody({ status, feedback }),
+			}
+		);
 	},
 
 	async updateAppStatus(
-		appId: string,
+		appId: number,
 		status: Database["public"]["Tables"]["apps"]["Update"]["status"]
 	) {
-		const { data, error } = await supabase
-			.from("apps")
-			.update({ status })
-			.eq("id", appId)
-			.select()
-			.single();
-
-		if (error) throw error;
-		return data;
+		return this.updateApp(appId, { status });
 	},
 };

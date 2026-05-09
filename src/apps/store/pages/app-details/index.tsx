@@ -11,7 +11,7 @@ import { useAppInstall } from "../../hooks/useAppInstall";
 import { appStoreService } from "../../services/appStoreService";
 
 const mockApp = {
-	id: "mock",
+	id: 0,
 	name: "Minecraft",
 	developer: "Mojang",
 	icon: placeholderImg,
@@ -66,9 +66,14 @@ const mockApp = {
 
 export default function AppDetailPage() {
 	const { id: appId } = useParams();
+	const parsedAppId = appId ? Number(appId) : null;
+	const numericAppId =
+		parsedAppId && Number.isInteger(parsedAppId) ? parsedAppId : null;
 	const [app, setApp] = useState(mockApp);
 	const [isLoading, setIsLoading] = useState(true);
-	const { installApp, isInstalling, isInstalled } = useAppInstall(appId ?? "");
+	const { installApp, isInstalling, isInstalled } = useAppInstall(
+		numericAppId ?? undefined
+	);
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -76,10 +81,10 @@ export default function AppDetailPage() {
 	}, [appId, isInstalling]);
 
 	async function fetchApp() {
-		if (!appId) return;
+		if (!numericAppId) return;
 
 		try {
-			const data = await appStoreService.getAppDetails(appId);
+			const data = await appStoreService.getAppDetails(numericAppId);
 			setApp({
 				...mockApp,
 				...data,
@@ -87,8 +92,10 @@ export default function AppDetailPage() {
 				category: data.primary_category || mockApp.category,
 				subCategory: data.subcategory || mockApp.subCategory,
 				description: data.description || mockApp.description,
-				rating: data.rating || mockApp.rating,
+				rating: mockApp.rating,
 				reviewCount: data.reviews?.length || mockApp.reviewCount,
+				price: data.price ? `$${data.price}` : mockApp.price,
+				reviews: mockApp.reviews,
 				lastUpdated:
 					new Date(data.updated_at).toLocaleDateString() || mockApp.lastUpdated,
 			});
@@ -165,7 +172,7 @@ export default function AppDetailPage() {
 						) : (
 							<Button
 								className="gap-2 btn-install"
-								onClick={() => appId && installApp(appId)}
+								onClick={() => numericAppId && installApp(numericAppId)}
 							>
 								{isInstalling ? (
 									<Spin

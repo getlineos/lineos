@@ -37,11 +37,11 @@ import { getPageTitle } from "./utils";
 
 export default function AppStore() {
 	return (
-		<div className="flex h-full bg-gray-100">
+		<div className="flex h-full overflow-hidden bg-[#f5f5f7] text-[#1d1d1f]">
 			<Sidebar />
 			<div className="flex-1 overflow-auto">
 				<Header />
-				<main className="p-6">
+				<main className="px-8 pb-10 pt-2">
 					<Routes>
 						<Route index element={<OverviewPage />} />
 						<Route path="support" element={<SupportPage />} />
@@ -125,29 +125,31 @@ const Header = () => {
 
 	return (
 		<div>
-			<header className="fixed w-[calc(100%-321px)] z-50 bg-white p-4 flex items-center justify-between border-b border-gray-200">
-				<h1 className="text-2xl font-bold">{getPageTitle(path)}</h1>
-				<div className="flex items-center gap-4">
-					<button className="text-gray-500 hover:text-gray-700 cursor-pointer">
+			<header className="sticky top-0 z-50 flex items-center justify-between border-b border-black/5 bg-[#f5f5f7]/85 px-8 py-4 backdrop-blur-2xl">
+				<h1 className="text-3xl font-semibold tracking-normal text-[#1d1d1f]">
+					{getPageTitle(path)}
+				</h1>
+				<div className="flex items-center gap-3">
+					<button className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-[#6e6e73] transition hover:bg-black/5 hover:text-[#1d1d1f]">
 						<Bell className="h-5 w-5" />
 					</button>
-					<div className="relative w-64">
-						<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+					<div className="relative w-72">
+						<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#86868b]" />
 						<Input
 							type="text"
 							placeholder="Search"
-							className="pl-9 bg-gray-100 border-0 cursor-pointer"
+							className="h-9 cursor-pointer rounded-full border-0 bg-white/80 pl-9 text-sm shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)] placeholder:text-[#86868b] focus-visible:ring-2 focus-visible:ring-[#0071e3]/25"
 						/>
 					</div>
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
-							<button className="w-8 h-8 rounded-full bg-gray-300 overflow-hidden cursor-pointer">
+							<button className="h-9 w-9 cursor-pointer overflow-hidden rounded-full bg-white shadow-[inset_0_0_0_1px_rgba(0,0,0,0.08)]">
 								<img
 									src={user?.user_metadata.avatar_url || placeholderUserImg}
 									alt="Profile"
 									width={32}
 									height={32}
-									className="object-cover"
+									className="h-full w-full object-cover"
 								/>
 							</button>
 						</DropdownMenuTrigger>
@@ -197,7 +199,6 @@ const Header = () => {
 					</DropdownMenu>
 				</div>
 			</header>
-			<div className="h-[69px]" />
 		</div>
 	);
 };

@@ -1,7 +1,7 @@
 import { appStoreRepository } from "./appStoreRepository";
 import { Database } from "@/types/database";
 import { AppSubmissionForm } from "../pages/publish/types";
-import { supabase } from "@/lib/supabase";
+import { apiRequest } from "@/lib/api";
 
 const transformAppData = (
 	app: Database["public"]["Tables"]["apps"]["Row"]
@@ -39,7 +39,7 @@ export const appStoreService = {
 		return data.map(transformAppData);
 	},
 
-	async getAppDetails(id: string) {
+	async getAppDetails(id: number) {
 		const [app, assets, territories, reviews] = await Promise.all([
 			appStoreRepository.getAppById(id),
 			appStoreRepository.getAppAssets(id),
@@ -55,19 +55,19 @@ export const appStoreService = {
 		};
 	},
 
-	async getAppMetadata(id: string) {
+	async getAppMetadata(id: number) {
 		const app = await appStoreRepository.getAppById(id);
 		return app;
 	},
 
 	async updateApp(
-		id: string,
+		id: number,
 		appData: Database["public"]["Tables"]["apps"]["Update"]
 	) {
 		return appStoreRepository.updateApp(id, appData);
 	},
 
-	async submitForReview(id: string) {
+	async submitForReview(id: number) {
 		return appStoreRepository.updateAppStatus(id, "pending_review");
 	},
 
@@ -76,24 +76,25 @@ export const appStoreService = {
 		file: File,
 		type: "icon" | "screenshots" | "previewVideo"
 	) {
-		// TODO: Implement actual file upload logic
+		const { fileService } = await import("./fileService");
+		const url = await fileService.uploadAppImage(file);
 		return {
-			url: URL.createObjectURL(file),
+			url,
 			type,
 			name: file.name,
 		};
 	},
 
-	async getAppAssets(appId: string) {
+	async getAppAssets(appId: number) {
 		return appStoreRepository.getAppAssets(appId);
 	},
 
-	async deleteAppAsset(assetId: string) {
+	async deleteAppAsset(assetId: number) {
 		return appStoreRepository.deleteAsset(assetId);
 	},
 
 	// Territory management
-	async updateAppTerritories(appId: string, territoryCodes: string[]) {
+	async updateAppTerritories(appId: number, territoryCodes: string[]) {
 		const currentTerritories = await appStoreRepository.getAppTerritories(
 			appId
 		);
@@ -115,12 +116,12 @@ export const appStoreService = {
 	},
 
 	// Review management
-	async getAppReviews(appId: string) {
+	async getAppReviews(appId: number) {
 		return appStoreRepository.getAppReviews(appId);
 	},
 
 	async reviewApp(
-		appId: string,
+		appId: number,
 		status: Database["public"]["Tables"]["app_reviews"]["Insert"]["status"],
 		feedback?: string
 	) {
@@ -159,6 +160,16 @@ export const appStoreService = {
 				slug,
 			});
 
+			await Promise.all(
+				(formData.screenshots ?? []).map((screenshot) =>
+					appStoreRepository.createAsset(app.id, {
+						asset_type: "screenshot",
+						file_path: screenshot.url,
+						file_size: screenshot.fileSize ?? 0,
+					})
+				)
+			);
+
 			return {
 				success: true,
 				message: "App submitted for review successfully",
@@ -171,17 +182,9 @@ export const appStoreService = {
 	},
 
 	async getPublishedApps() {
-		const { data, error } = await supabase
-			.from("apps")
-			.select("*")
-			.eq("status", "approved")
-			.order("created_at", { ascending: false });
-
-		if (error) {
-			console.error("Error fetching published apps:", error);
-			throw error;
-		}
-
+		const data = await apiRequest<Database["public"]["Tables"]["apps"]["Row"][]>(
+			"/api/apps?status=approved"
+		);
 		return data.map(transformAppData);
 	},
 };

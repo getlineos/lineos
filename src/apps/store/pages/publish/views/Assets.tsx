@@ -6,11 +6,20 @@ import { fileService } from "../../../services/fileService";
 import { useRef, useState } from "react";
 import { message } from "antd";
 
+type UploadedScreenshot = {
+	url: string;
+	name: string;
+	fileSize?: number;
+};
+
 export default function Assets() {
 	const { setValue, watch } = useFormContext();
-	const [isUploading, setIsUploading] = useState(false);
+	const [isUploadingIcon, setIsUploadingIcon] = useState(false);
+	const [isUploadingScreenshot, setIsUploadingScreenshot] = useState(false);
 	const iconUrl = watch("icon");
+	const screenshots = (watch("screenshots") ?? []) as UploadedScreenshot[];
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	const screenshotInputRef = useRef<HTMLInputElement>(null);
 
 	const handleFileUpload = async (
 		event: React.ChangeEvent<HTMLInputElement>
@@ -29,15 +38,65 @@ export default function Assets() {
 		}
 
 		try {
-			setIsUploading(true);
+			setIsUploadingIcon(true);
 			const publicUrl = await fileService.uploadAppIcon(file);
-			setValue("icon", publicUrl);
+			setValue("icon", publicUrl, { shouldDirty: true, shouldValidate: true });
 			message.success("Icon uploaded successfully");
 		} catch (error) {
 			console.error("Failed to upload icon:", error);
 			message.error("Failed to upload icon");
 		} finally {
-			setIsUploading(false);
+			setIsUploadingIcon(false);
+			event.target.value = "";
+		}
+	};
+
+	const handleScreenshotUpload = async (
+		event: React.ChangeEvent<HTMLInputElement>
+	) => {
+		const files = Array.from(event.target.files ?? []);
+		if (files.length === 0) return;
+
+		const invalidFile = files.find(
+			(file) => !file.type.match(/^image\/(jpeg|png|webp)$/)
+		);
+		if (invalidFile) {
+			message.error("Only JPEG, PNG, and WebP screenshots are allowed");
+			event.target.value = "";
+			return;
+		}
+
+		const oversizedFile = files.find((file) => file.size > 10 * 1024 * 1024);
+		if (oversizedFile) {
+			message.error("Each screenshot must be less than 10MB");
+			event.target.value = "";
+			return;
+		}
+
+		try {
+			setIsUploadingScreenshot(true);
+			const uploaded = await Promise.all(
+				files.map(async (file) => ({
+					url: await fileService.uploadAppImage(file),
+					name: file.name,
+					fileSize: file.size,
+				}))
+			);
+			setValue("screenshots", [...screenshots, ...uploaded], {
+				shouldDirty: true,
+				shouldValidate: true,
+			});
+			message.success(
+				uploaded.length === 1
+					? "Screenshot uploaded successfully"
+					: "Screenshots uploaded successfully"
+			);
+		} catch (error) {
+			console.error("Failed to upload screenshots:", error);
+			message.error("Failed to upload screenshots");
+		} finally {
+			setIsUploadingScreenshot(false);
+			event.target.value = "";
 		}
 	};
 
@@ -46,11 +105,26 @@ export default function Assets() {
 
 		try {
 			await fileService.deleteAppIcon(iconUrl);
-			setValue("icon", "");
+			setValue("icon", "", { shouldDirty: true, shouldValidate: true });
 			message.success("Icon deleted successfully");
 		} catch (error) {
 			console.error("Failed to delete icon:", error);
 			message.error("Failed to delete icon");
+		}
+	};
+
+	const handleDeleteScreenshot = async (screenshot: UploadedScreenshot) => {
+		try {
+			await fileService.deleteAppImage(screenshot.url);
+			setValue(
+				"screenshots",
+				screenshots.filter((item) => item.url !== screenshot.url),
+				{ shouldDirty: true, shouldValidate: true }
+			);
+			message.success("Screenshot deleted successfully");
+		} catch (error) {
+			console.error("Failed to delete screenshot:", error);
+			message.error("Failed to delete screenshot");
 		}
 	};
 
@@ -106,17 +180,17 @@ export default function Assets() {
 							accept="image/jpeg,image/png"
 							className="hidden"
 							onChange={handleFileUpload}
-							disabled={isUploading}
+							disabled={isUploadingIcon}
 						/>
 						<Button
 							size="sm"
 							variant="outline"
 							className="mt-3 cursor-pointer"
-							disabled={isUploading}
+							disabled={isUploadingIcon}
 							onClick={handleUploadClick}
 						>
 							<Upload className="h-4 w-4 mr-2" />
-							{isUploading ? "Uploading..." : "Upload Icon"}
+							{isUploadingIcon ? "Uploading..." : "Upload Icon"}
 						</Button>
 					</div>
 				</div>
@@ -130,55 +204,43 @@ export default function Assets() {
 				</p>
 
 				<div className="space-y-6">
-					{/* <div>
-                <h3 className="text-md font-medium mb-3">
-                    iPhone Screenshots
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {[1, 2, 3].map((index) => (
-                        <div
-                            key={index}
-                            className="aspect-[9/19.5] bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-4"
-                        >
-                            <Upload className="h-8 w-8 text-gray-400 mb-2" />
-                            <span className="text-xs font-medium text-gray-700 text-center">
-                                1290×2796 px
-                            </span>
-                            <Button size="sm" variant="ghost" className="mt-2">
-                                Upload
-                            </Button>
-                        </div>
-                    ))}
-                    <div className="aspect-[9/19.5] bg-blue-50 rounded-xl border-2 border-dashed border-blue-200 flex items-center justify-center">
-                        <Button size="sm" variant="outline" className="bg-white">
-                            <span className="text-lg mr-1">+</span> Add More
-                        </Button>
-                    </div>
-                </div>
-            </div> */}
-
 					<div>
 						<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-							<div className="aspect-[4/3] bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-4">
-								<Upload className="h-8 w-8 text-gray-400 mb-2" />
-								<span className="text-xs font-medium text-gray-700 text-center">
-									2048×1536 px
-								</span>
-								<Button size="sm" variant="ghost" className="mt-2">
-									Upload
-								</Button>
-							</div>
-							<div className="aspect-[4/3] bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-4">
-								<Upload className="h-8 w-8 text-gray-400 mb-2" />
-								<span className="text-xs font-medium text-gray-700 text-center">
-									2048×1536 px
-								</span>
-								<Button size="sm" variant="ghost" className="mt-2">
-									Upload
-								</Button>
-							</div>
+							{screenshots.map((screenshot) => (
+								<div
+									key={screenshot.url}
+									className="aspect-[4/3] bg-gray-100 rounded-xl border border-gray-200 overflow-hidden relative group"
+								>
+									<img
+										src={screenshot.url}
+										alt={screenshot.name}
+										className="h-full w-full object-cover"
+									/>
+									<button
+										onClick={() => handleDeleteScreenshot(screenshot)}
+										className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+									>
+										<X className="h-4 w-4" />
+									</button>
+								</div>
+							))}
 							<div className="aspect-[4/3] bg-blue-50 rounded-xl border-2 border-dashed border-blue-200 flex items-center justify-center">
-								<Button size="sm" variant="outline" className="bg-white">
+								<input
+									ref={screenshotInputRef}
+									type="file"
+									accept="image/jpeg,image/png,image/webp"
+									className="hidden"
+									multiple
+									onChange={handleScreenshotUpload}
+									disabled={isUploadingScreenshot}
+								/>
+								<Button
+									size="sm"
+									variant="outline"
+									className="bg-white"
+									disabled={isUploadingScreenshot}
+									onClick={() => screenshotInputRef.current?.click()}
+								>
 									<span className="text-lg mr-1">+</span> Add More
 								</Button>
 							</div>

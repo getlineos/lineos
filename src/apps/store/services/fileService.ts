@@ -1,56 +1,32 @@
-import { supabase } from "@/lib/supabase";
-
-const generateUniqueFileName = (originalName: string) => {
-	const timestamp = Date.now();
-	const random = Math.random().toString(36).substring(2, 8);
-	const fileExt = originalName.split(".").pop();
-	return `icon-${timestamp}-${random}.${fileExt}`;
-};
+import { apiRequest, toJsonBody } from "@/lib/api";
 
 export const fileService = {
 	async uploadAppIcon(file: File) {
-		const fileName = generateUniqueFileName(file.name);
-		const filePath = `app-icons/${fileName}`;
+		return this.uploadAppImage(file);
+	},
 
-		// Get the current session
-		const {
-			data: { session },
-		} = await supabase.auth.getSession();
-		if (!session) {
-			throw new Error("Not authenticated");
-		}
+	async uploadAppImage(file: File) {
+		const formData = new FormData();
+		formData.append("file", file);
+		const { url } = await apiRequest<{ url: string }>(
+			"/api/uploads/app-images",
+			{
+				method: "POST",
+				body: formData,
+			}
+		);
 
-		const { error } = await supabase.storage
-			.from("lineos")
-			.upload(filePath, file, {
-				cacheControl: "3600",
-				upsert: true,
-			});
-
-		if (error) throw error;
-
-		const {
-			data: { publicUrl },
-		} = supabase.storage.from("lineos").getPublicUrl(filePath);
-
-		return publicUrl;
+		return url;
 	},
 
 	async deleteAppIcon(url: string) {
-		const path = url.split("/").pop();
-		if (!path) return;
+		await this.deleteAppImage(url);
+	},
 
-		const {
-			data: { session },
-		} = await supabase.auth.getSession();
-		if (!session) {
-			throw new Error("Not authenticated");
-		}
-
-		const { error } = await supabase.storage
-			.from("lineos")
-			.remove([`app-icons/${path}`]);
-
-		if (error) throw error;
+	async deleteAppImage(url: string) {
+		await apiRequest<{ ok: boolean }>("/api/uploads/app-images", {
+			method: "DELETE",
+			body: toJsonBody({ url }),
+		});
 	},
 };

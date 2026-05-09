@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Session, User } from "@supabase/supabase-js";
+import { Session, User } from "@/types/auth";
 import { Profile } from "@/apps/store/services/profileService";
 import { profileApi } from "./profileApi";
 

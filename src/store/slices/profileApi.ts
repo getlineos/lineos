@@ -6,7 +6,7 @@ export const profileApi = createApi({
 	baseQuery: fetchBaseQuery({ baseUrl: "/api" }),
 	tagTypes: ["Profile"],
 	endpoints: (builder) => ({
-		getProfile: builder.query<Profile | null, string>({
+		getProfile: builder.query<Profile | null, number>({
 			queryFn: async (userId) => {
 				try {
 					const profile = await profileService.getProfile(userId);
@@ -19,7 +19,7 @@ export const profileApi = createApi({
 		}),
 		updateProfile: builder.mutation<
 			Profile,
-			{ userId: string; updates: Partial<Profile> }
+			{ userId: number; updates: Partial<Profile> }
 		>({
 			queryFn: async ({ userId, updates }) => {
 				try {
@@ -31,7 +31,7 @@ export const profileApi = createApi({
 			},
 			invalidatesTags: ["Profile"],
 		}),
-		applyForDeveloper: builder.mutation<Profile, string>({
+		applyForDeveloper: builder.mutation<Profile, number>({
 			queryFn: async (userId) => {
 				try {
 					const profile = await profileService.applyForDeveloper(userId);
@@ -42,7 +42,7 @@ export const profileApi = createApi({
 			},
 			invalidatesTags: ["Profile"],
 		}),
-		rejectDeveloper: builder.mutation<Profile, string>({
+		rejectDeveloper: builder.mutation<Profile, number>({
 			queryFn: async (userId) => {
 				try {
 					const profile = await profileService.rejectDeveloper(userId);

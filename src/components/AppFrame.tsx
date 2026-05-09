@@ -18,7 +18,7 @@ export default function AppFrame({ app }: AppFrameProps) {
 	return (
 		<iframe
 			src={app.url}
-			className="w-full h-full border-0"
+			className="w-full h-full border-0 rounded-[13px] overflow-hidden bg-white"
 			title={app.name}
 			allow={app.allow ?? defaultAllow}
 			sandbox={sandbox}

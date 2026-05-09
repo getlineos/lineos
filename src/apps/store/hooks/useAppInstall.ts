@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { appStoreService } from "../services/appStoreService";
 
-export function useAppInstall(appId?: string) {
+export function useAppInstall(appId?: string | number) {
 	const apps = useSelector((state: RootState) => state.installedApps?.apps);
 	const [isInstalling, setIsInstalling] = useState(false);
 	const [isInstalled, setIsInstalled] = useState(false);
@@ -19,7 +19,7 @@ export function useAppInstall(appId?: string) {
 		}
 	}, [appId]);
 
-	const installApp = async (appId: string) => {
+	const installApp = async (appId: number) => {
 		if (isInstalling || isInstalled || !appId) return;
 
 		try {
@@ -56,7 +56,7 @@ export function useAppInstall(appId?: string) {
 		}
 	};
 
-	const uninstallApp = async (appId: string) => {
+	const uninstallApp = async (appId: string | number) => {
 		store.dispatch(removeInstalledApp(appId));
 	};
 

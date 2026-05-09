@@ -40,8 +40,7 @@ import StocksIcon from "../assets/img/icons/stocks.png";
 import XcodeIcon from "../assets/img/icons/xcode.png";
 import TrashIcon from "../assets/img/icons/trash.png";
 import LoopIcon from "../assets/img/icons/loop.png";
-import ExpensifyIcon from "../assets/img/icons/expensify.svg";
-import CompresslyIcon from "../assets/img/icons/compressly.svg";
+import PDFToolkitIcon from "../assets/img/icons/pdf-toolkit.svg";
 import devConfig from "../../../apps/dev.config.json";
 import { useNavigate } from "react-router";
 import storage from "@/utils/storage";
@@ -49,9 +48,9 @@ import { store } from "@/store/persistence";
 import { setInstalledApps } from "@/store/slices/installedApps";
 
 export interface AppConfig {
-	id?: string;
+	id?: string | number;
 	name: string;
-	icon: string;
+	icon?: string;
 	slug: string;
 	url?: string;
 	onClick?: (navigate: ReturnType<typeof useNavigate>) => void;
@@ -61,30 +60,136 @@ export interface AppConfig {
 	sandbox?: string;
 }
 
-export const initializeInstalledApps = (forceUpdate?: boolean) => {
-	const installedApps = storage.get("installedApps");
+type DbApp = {
+	id: number;
+	name: string;
+	slug: string;
+	icon_url: string;
+	app_url: string;
+};
 
-	if (!installedApps || forceUpdate) {
+export const initializeInstalledApps = async (forceUpdate?: boolean) => {
+	const storedApps = storage.get("installedApps");
+	const installedApps = Array.isArray(storedApps) ? storedApps : [];
+	const dbApps = await getDbApps();
+	const dbAppsBySlug = new Map(dbApps.map((app) => [app.slug, app]));
+	const installedAppsBySlug = new Map(
+		installedApps.map((app: AppConfig) => [app.slug, app])
+	);
+	const configuredApps = apps.map((app) =>
+		mergeDbAppConfig(
+			mergeInstalledAppConfig(app, installedAppsBySlug),
+			dbAppsBySlug
+		)
+	);
+
+	if (!installedApps.length || forceUpdate) {
 		console.log("Setting installed apps");
-		storage.set("installedApps", apps);
-		store.dispatch(setInstalledApps(apps));
+		storage.set("installedApps", configuredApps);
+		store.dispatch(setInstalledApps(configuredApps));
 	} else {
 		const mergedApps = [
-			...apps.filter(
-				(defaultApp) =>
-					!installedApps.some(
-						(installedApp: AppConfig) => installedApp.slug === defaultApp.slug,
-					),
-			),
-			...installedApps,
+			...configuredApps,
+			...installedApps.filter(
+				(installedApp: AppConfig) =>
+					!configuredApps.some(
+						(defaultApp) => defaultApp.slug === installedApp.slug
+					)
+			).map((app: AppConfig) => mergeDbAppConfig(app, dbAppsBySlug)),
 		];
 		storage.set("installedApps", mergedApps);
 		store.dispatch(setInstalledApps(mergedApps));
 	}
 };
 
+async function getDbApps(): Promise<AppConfig[]> {
+	try {
+		const rows = await Promise.all([
+			fetchDbAppRows("/api/apps?status=approved"),
+			fetchDbAppRows("/api/apps"),
+		]);
+		return dedupeBySlug(rows.flat()).map((app) => ({
+			id: app.id,
+			name: app.name,
+			icon: app.icon_url,
+			slug: app.slug,
+			url: app.app_url || getStandaloneAppUrl(app.slug),
+			showInDock: false,
+			showInLaunchpad: true,
+			sandbox: "allow-same-origin allow-scripts allow-forms",
+		}));
+	} catch (error) {
+		console.warn("Failed to load apps from database", error);
+		return [];
+	}
+}
+
+async function fetchDbAppRows(path: string): Promise<DbApp[]> {
+	try {
+		const response = await fetch(path, {
+			credentials: "include",
+		});
+		if (!response.ok) {
+			return [];
+		}
+
+		return response.json();
+	} catch {
+		return [];
+	}
+}
+
+function dedupeBySlug(apps: DbApp[]) {
+	const appsBySlug = new Map<string, DbApp>();
+	for (const app of apps) {
+		appsBySlug.set(app.slug, app);
+	}
+	return [...appsBySlug.values()];
+}
+
+function mergeDbAppConfig(
+	app: AppConfig,
+	dbAppsBySlug: Map<string, AppConfig>
+): AppConfig {
+	const dbApp = dbAppsBySlug.get(app.slug);
+	if (!dbApp) {
+		return app;
+	}
+
+	return {
+		...app,
+		id: dbApp.id,
+		name: dbApp.name || app.name,
+		icon: dbApp.icon || app.icon,
+		url: dbApp.url || app.url,
+	};
+}
+
+function mergeInstalledAppConfig(
+	app: AppConfig,
+	installedAppsBySlug: Map<string, AppConfig>
+): AppConfig {
+	const installedApp = installedAppsBySlug.get(app.slug);
+	if (!installedApp) {
+		return app;
+	}
+
+	return {
+		...app,
+		id: installedApp.id ?? app.id,
+		icon: installedApp.icon || app.icon,
+		url: installedApp.url || app.url,
+		showInDock: installedApp.showInDock ?? app.showInDock,
+		showInLaunchpad: installedApp.showInLaunchpad ?? app.showInLaunchpad,
+	};
+}
+
 const getStandaloneAppUrl = (appName: string) => {
 	if (import.meta.env.DEV) {
+		const entry = devConfig.apps?.find((app) => app.slug === appName);
+		if (entry && typeof entry.port === "number") {
+			return `http://127.0.0.1:${entry.port}/${appName}/`;
+		}
 		return `http://127.0.0.1:${devConfig.proxyPort}/${appName}/`;
 	}
 
@@ -183,6 +288,15 @@ export const apps: AppConfig[] = [
 		showInDock: true,
 		showInLaunchpad: true,
 		slug: "calculator",
+	},
+	{
+		name: "PDFToolkit",
+		icon: PDFToolkitIcon,
+		showInDock: true,
+		showInLaunchpad: true,
+		slug: "pdf-toolkit",
+		url: getStandaloneAppUrl("pdf-toolkit"),
+		sandbox: "allow-same-origin allow-scripts allow-forms allow-downloads",
 	},
 	...getDevApps(),
 	{
@@ -389,28 +503,25 @@ function isLocalDevHost() {
 	);
 }
 
+function getAppName(slug: string) {
+	return slug
+		.split("-")
+		.map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+		.join(" ");
+}
+
 export function getDevApps() {
 	if (isLocalDevHost()) {
-		return [
-			{
-				name: "Expensify",
-				icon: ExpensifyIcon,
+		return devConfig.apps
+			.filter((app) => app.slug !== "pdf-toolkit")
+			.map((app) => ({
+				name: getAppName(app.slug),
 				showInDock: true,
 				showInLaunchpad: true,
-				slug: "expensify",
-				url: getStandaloneAppUrl("expensify"),
+				slug: app.slug,
+				url: getStandaloneAppUrl(app.slug),
 				sandbox: "allow-same-origin allow-scripts allow-forms",
-			},
-			{
-				name: "Compressly",
-				icon: CompresslyIcon,
-				showInDock: true,
-				showInLaunchpad: true,
-				slug: "compressly",
-				url: getStandaloneAppUrl("compressly"),
-				sandbox: "allow-same-origin allow-scripts allow-forms",
-			},
-		];
+			}));
 	}
 
 	return [];

@@ -32,7 +32,7 @@ export default function Developer() {
 		data: profile,
 		isLoading: isProfileLoading,
 		refetch,
-	} = useGetProfileQuery(user?.id || "", { skip: !user?.id });
+	} = useGetProfileQuery(user?.id ?? 0, { skip: !user?.id });
 
 	const handleDeveloperStatusChange = async (status: boolean) => {
 		if (!user) return;

@@ -1,7 +1,7 @@
-import { supabase } from "@/lib/supabase";
+import { authService } from "@/apps/store/services/authService";
 import { AppDispatch } from "@/store/persistence";
 import { setLoading, setSession, setUser } from "@/store/slices/auth";
-import { Session } from "@supabase/supabase-js";
+import { Session } from "@/types/auth";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
@@ -11,25 +11,27 @@ export function useAuth() {
 	const dispatch = useDispatch<AppDispatch>();
 
 	useEffect(() => {
-		supabase.auth.getSession().then(({ data: { session } }) => {
-			setAuthSession(session);
-			setIsLoading(false);
-			dispatch(setSession(session));
-			dispatch(setUser(session?.user ?? null));
-			dispatch(setLoading(false));
-		});
+		let isMounted = true;
 
-		const {
-			data: { subscription },
-		} = supabase.auth.onAuthStateChange((_event, session) => {
-			setAuthSession(session);
-			setIsLoading(false);
-			dispatch(setSession(session));
-			dispatch(setUser(session?.user ?? null));
-			dispatch(setLoading(false));
-		});
+		authService
+			.getSession()
+			.catch(() => null)
+			.then((session) => {
+				if (!isMounted) {
+					return;
+				}
 
-		return () => subscription.unsubscribe();
+				const authSession = session as Session | null;
+				setAuthSession(authSession);
+				setIsLoading(false);
+				dispatch(setSession(authSession));
+				dispatch(setUser(authSession?.user ?? null));
+				dispatch(setLoading(false));
+			});
+
+		return () => {
+			isMounted = false;
+		};
 	}, [dispatch]);
 
 	return {

@@ -4,9 +4,13 @@ import dayjs from "dayjs";
 import {
 	ChevronDown,
 	FileText,
+	Folder,
+	MoreHorizontal,
+	PanelLeft,
 	Pin,
 	Plus,
 	Search,
+	SquarePen,
 	Trash2,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -208,30 +212,36 @@ export default function NotesApp() {
 	};
 
 	return (
-		<div className="h-full overflow-hidden bg-[#f6f0d8] text-slate-900">
-			<div className="grid h-full grid-cols-[260px_340px_minmax(0,1fr)]">
-				<aside className="border-r border-[#e4dcc0] bg-[#efe5bc] px-5 py-6">
-					<div className="flex items-center justify-between">
-						<h1 className="text-3xl font-semibold tracking-tight text-[#7c5d10]">
-							Notes
-						</h1>
-						<button
-							type="button"
-							onClick={() => createNote(selectedFolder === "all" ? "icloud" : selectedFolder)}
-							className="rounded-2xl bg-[#f6c942] p-2.5 text-[#6f5200] shadow-sm transition hover:bg-[#f2bf28]"
-						>
-							<Plus className="h-5 w-5" />
-						</button>
-					</div>
-
-					<div className="mt-6 space-y-2">
+		<div className="h-full overflow-hidden bg-[#ececec] text-[#1d1d1f]">
+			<div className="grid h-full grid-cols-[230px_330px_minmax(0,1fr)] rounded-[10px] border border-black/10 bg-[#f7f2df]">
+				<aside className="border-r border-black/10 bg-[#e9e9e9]/90 backdrop-blur-xl">
+					<div className="px-4 pb-3 pt-5">
+						<div className="mb-4 flex items-start justify-between gap-2">
+							<div className="flex min-w-0 items-center gap-2">
+								<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#ffd45a] text-[#7a5700]">
+									<FileText className="h-4 w-4" />
+								</div>
+								<div className="min-w-0">
+									<h1 className="text-xl font-semibold tracking-tight">Notes</h1>
+									<p className="text-xs text-[#737373]">{notes.length} notes</p>
+								</div>
+							</div>
+							<button
+								type="button"
+								onClick={() => createNote(selectedFolder === "all" ? "icloud" : selectedFolder)}
+								className="mt-0.5 shrink-0 rounded-md p-1.5 text-[#7a6a2d] transition hover:bg-black/5"
+								title="New note"
+							>
+								<SquarePen className="h-4 w-4" />
+							</button>
+						</div>
 						<SidebarRow
 							label="All iCloud"
 							count={folderCounts.all}
 							active={selectedFolder === "all"}
 							onClick={() => setSelectedFolder("all")}
-							accent="text-yellow-600"
-							surface="bg-yellow-100/70"
+							accent="text-[#6a5a22]"
+							surface="bg-white/70"
 						/>
 						{(Object.keys(folderMeta) as NoteFolder[]).map((folder) => (
 							<SidebarRow
@@ -240,87 +250,103 @@ export default function NotesApp() {
 								count={folderCounts[folder]}
 								active={selectedFolder === folder}
 								onClick={() => setSelectedFolder(folder)}
-								accent={folderMeta[folder].accent}
-								surface={folderMeta[folder].surface}
+								accent="text-[#444]"
+								surface="bg-white/70"
 							/>
 						))}
 					</div>
 
-					<div className="mt-8">
-						<div className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-[#8e7a3e]">
+					<div className="mt-3 px-4">
+						<div className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#777]">
 							<ChevronDown className="h-4 w-4" />
 							Folders
 						</div>
-						<div className="space-y-2">
+						<div className="space-y-1">
 							{(Object.keys(folderMeta) as NoteFolder[]).map((folder) => (
 								<button
 									key={folder}
 									type="button"
 									onClick={() => createNote(folder)}
-									className="flex w-full items-center justify-between rounded-2xl px-3 py-2 text-left text-sm text-[#6c5b27] transition hover:bg-white/45"
+									className="flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left text-sm text-[#444] transition hover:bg-white/55"
 								>
-									<span>{folderMeta[folder].label}</span>
-									<Plus className="h-4 w-4" />
+									<span className="flex items-center gap-2">
+										<Folder className="h-4 w-4 text-[#9a812b]" />
+										{folderMeta[folder].label}
+									</span>
+									<Plus className="h-3.5 w-3.5 text-[#777]" />
 								</button>
 							))}
 						</div>
 					</div>
 				</aside>
 
-				<section className="border-r border-[#e7dfc7] bg-[#f7f2e2]">
-					<div className="border-b border-[#e7dfc7] px-5 py-4">
+				<section className="border-r border-black/10 bg-[#f7f2e5]">
+					<div className="flex h-12 items-center justify-between border-b border-black/10 px-4">
+						<div className="flex items-center gap-2 text-sm font-semibold text-[#514624]">
+							<PanelLeft className="h-4 w-4 text-[#8b7a3f]" />
+							{selectedFolder === "all" ? "All iCloud" : folderMeta[selectedFolder].label}
+						</div>
+						<button
+							type="button"
+							className="rounded-md p-1.5 text-[#8b7a3f] transition hover:bg-black/5"
+							title="More"
+						>
+							<MoreHorizontal className="h-4 w-4" />
+						</button>
+					</div>
+					<div className="border-b border-black/10 px-4 py-3">
 						<div className="relative">
-							<Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9b8b59]" />
+							<Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8f8f8f]" />
 							<Input
 								value={searchQuery}
 								onChange={(event) => setSearchQuery(event.target.value)}
 								placeholder="Search"
-								className="border-[#e1d8bc] bg-white pl-10 text-[#6f5e2c] placeholder:text-[#aa9c73]"
+								className="h-8 rounded-lg border-black/10 bg-white/75 pl-8 text-sm text-[#333] shadow-inner placeholder:text-[#8f8f8f] focus-visible:ring-[#f3c642]/35"
 							/>
 						</div>
 					</div>
 
-					<div className="h-[calc(100%-73px)] overflow-y-auto p-3">
+					<div className="h-[calc(100%-105px)] overflow-y-auto px-2 py-2">
 						{filteredNotes.length ? (
-							<div className="space-y-2">
+							<div className="space-y-1">
 								{filteredNotes.map((note) => (
 									<button
 										key={note.id}
 										type="button"
 										onClick={() => setSelectedNoteId(note.id)}
 										className={[
-											"block w-full rounded-[22px] border px-4 py-4 text-left transition",
+											"block w-full rounded-lg px-3 py-3 text-left transition",
 											selectedNote?.id === note.id
-												? "border-[#f2c84f] bg-[#ffe08a]"
-												: "border-transparent bg-white/75 hover:border-[#ead28f] hover:bg-white",
+												? "bg-[#f7cf5b]"
+												: "hover:bg-white/70",
 										].join(" ")}
 									>
 										<div className="flex items-start justify-between gap-3">
 											<div className="min-w-0">
-												<h2 className="truncate text-sm font-semibold text-[#4b4020]">
+												<h2 className="truncate text-[13px] font-semibold text-[#2c2c2e]">
 													{note.title}
 												</h2>
-												<p className="mt-1 text-xs text-[#8b7b4f]">
+												<p className="mt-1 text-[11px] text-[#70684b]">
 													{dayjs(note.updatedAt).format("D MMM YYYY, HH:mm")}
 												</p>
 											</div>
 											{note.pinned ? (
-												<Pin className="h-4 w-4 shrink-0 text-[#b18816]" />
+												<Pin className="h-3.5 w-3.5 shrink-0 text-[#8d6c00]" />
 											) : null}
 										</div>
-										<p className="mt-3 line-clamp-3 text-sm leading-6 text-[#6f6238]">
+										<p className="mt-2 line-clamp-2 text-[13px] leading-5 text-[#5c563f]">
 											{note.content || "No additional text"}
 										</p>
 									</button>
 								))}
 							</div>
 						) : (
-							<div className="flex h-full flex-col items-center justify-center rounded-[28px] border border-dashed border-[#dccf9d] bg-white/40 px-6 text-center">
-								<FileText className="h-10 w-10 text-[#b49b4a]" />
-								<h2 className="mt-4 text-lg font-semibold text-[#61542b]">
+							<div className="flex h-full flex-col items-center justify-center rounded-xl border border-dashed border-black/10 bg-white/45 px-6 text-center">
+								<FileText className="h-9 w-9 text-[#b49b4a]" />
+								<h2 className="mt-4 text-base font-semibold text-[#514624]">
 									No notes found
 								</h2>
-								<p className="mt-2 text-sm text-[#8f8157]">
+								<p className="mt-2 text-sm text-[#7d714b]">
 									Try another search or create a fresh note.
 								</p>
 							</div>
@@ -328,15 +354,15 @@ export default function NotesApp() {
 					</div>
 				</section>
 
-				<section className="flex min-w-0 flex-col bg-[#fffdf5]">
-					<div className="flex items-center justify-between border-b border-[#ece4cc] px-6 py-4">
+				<section className="flex min-w-0 flex-col bg-[#fffdf7]">
+					<div className="flex h-12 items-center justify-between border-b border-black/10 bg-[#fbf7e9] px-5">
 						<div>
-							<h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-[#a29059]">
+							<h2 className="text-xs font-semibold text-[#8a7a3e]">
 								{selectedNote
 									? folderMeta[selectedNote.folder].label
 									: "Notes"}
 							</h2>
-							<p className="mt-1 text-sm text-[#8f8259]">
+							<p className="text-[11px] text-[#7c7251]">
 								{selectedNote
 									? `Edited ${dayjs(selectedNote.updatedAt).format("D MMM YYYY, HH:mm")}`
 									: "Select or create a note to begin"}
@@ -351,18 +377,18 @@ export default function NotesApp() {
 									selectedNote &&
 									updateSelectedNote({ pinned: !selectedNote.pinned })
 								}
-								className="rounded-2xl border border-[#e7ddbf] bg-white px-3 py-2 text-sm font-medium text-[#6f6030] transition hover:bg-[#fff7df] disabled:cursor-not-allowed disabled:opacity-50"
+								className="rounded-md border border-black/10 bg-white/65 px-2.5 py-1.5 text-xs font-medium text-[#6f6030] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
 							>
-								<Pin className="mr-2 inline h-4 w-4" />
+								<Pin className="mr-1.5 inline h-3.5 w-3.5" />
 								{selectedNote?.pinned ? "Unpin" : "Pin"}
 							</button>
 							<button
 								type="button"
 								disabled={!selectedNote}
 								onClick={deleteSelectedNote}
-								className="rounded-2xl border border-[#f0d1c2] bg-white px-3 py-2 text-sm font-medium text-[#b2552b] transition hover:bg-[#fff1ea] disabled:cursor-not-allowed disabled:opacity-50"
+								className="rounded-md border border-black/10 bg-white/65 px-2.5 py-1.5 text-xs font-medium text-[#b2552b] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
 							>
-								<Trash2 className="mr-2 inline h-4 w-4" />
+								<Trash2 className="mr-1.5 inline h-3.5 w-3.5" />
 								Delete
 							</button>
 						</div>
@@ -370,16 +396,16 @@ export default function NotesApp() {
 
 					{selectedNote ? (
 						<div className="flex min-h-0 flex-1 flex-col">
-							<div className="px-8 pt-8">
+							<div className="px-10 pt-8">
 								<Input
 									value={selectedNote.title}
 									onChange={(event) =>
 										updateSelectedNote({ title: event.target.value || "Untitled Note" })
 									}
-									className="border-0 bg-transparent px-0 text-4xl font-semibold tracking-tight text-[#443a1d] shadow-none focus-visible:ring-0"
+									className="h-auto border-0 bg-transparent px-0 text-4xl font-bold tracking-tight text-[#2f2a1a] shadow-none focus-visible:ring-0"
 								/>
 							</div>
-							<div className="px-8 pt-4">
+							<div className="px-10 pt-4">
 								<select
 									value={selectedNote.folder}
 									onChange={(event) =>
@@ -387,7 +413,7 @@ export default function NotesApp() {
 											folder: event.target.value as NoteFolder,
 										})
 									}
-									className="rounded-xl border border-[#e5d9b4] bg-[#fff8e6] px-3 py-2 text-sm text-[#74642f]"
+									className="rounded-md border border-black/10 bg-[#fff7de] px-2.5 py-1.5 text-xs text-[#74642f] outline-none"
 								>
 									{(Object.keys(folderMeta) as NoteFolder[]).map((folder) => (
 										<option key={folder} value={folder}>
@@ -396,7 +422,7 @@ export default function NotesApp() {
 									))}
 								</select>
 							</div>
-							<div className="min-h-0 flex-1 px-8 pb-8 pt-5">
+							<div className="min-h-0 flex-1 px-10 pb-9 pt-6">
 								<Textarea
 									value={selectedNote.content}
 									onChange={(event) =>
@@ -406,14 +432,14 @@ export default function NotesApp() {
 										})
 									}
 									placeholder="Start writing..."
-									className="h-full min-h-full resize-none border-0 bg-transparent px-0 py-0 text-base leading-8 text-[#4d4221] shadow-none focus-visible:ring-0"
+									className="h-full min-h-full resize-none border-0 bg-transparent px-0 py-0 text-[17px] leading-8 text-[#37311f] shadow-none placeholder:text-[#b2a77a] focus-visible:ring-0"
 								/>
 							</div>
 						</div>
 					) : (
 						<div className="flex flex-1 items-center justify-center px-8">
 							<div className="max-w-md text-center">
-								<FileText className="mx-auto h-14 w-14 text-[#c6b16f]" />
+								<FileText className="mx-auto h-12 w-12 text-[#c6b16f]" />
 								<h2 className="mt-5 text-2xl font-semibold text-[#544821]">
 									No note selected
 								</h2>
@@ -423,7 +449,7 @@ export default function NotesApp() {
 								<button
 									type="button"
 									onClick={() => createNote()}
-									className="mt-6 rounded-2xl bg-[#f6c942] px-4 py-3 text-sm font-medium text-[#6f5200] shadow-sm transition hover:bg-[#f2bf28]"
+									className="mt-6 rounded-md bg-[#f6c942] px-4 py-2 text-sm font-medium text-[#6f5200] transition hover:bg-[#f2bf28]"
 								>
 									Create Note
 								</button>

@@ -62,8 +62,13 @@ export default function Account() {
 				</div>
 				<div>
 					<h2 className="text-xl font-semibold">
-						{user?.user_metadata.name ??
-							user?.email?.split("@")[0] ??
+						{[
+							user?.user_metadata.first_name,
+							user?.user_metadata.last_name,
+						]
+							.filter(Boolean)
+							.join(" ") ||
+							user?.email?.split("@")[0] ||
 							"John Doe"}
 					</h2>
 					<p className="text-gray-500">{user?.email}</p>

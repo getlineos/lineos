@@ -83,7 +83,10 @@ export default function AuthModal() {
 				throw new Error("Passwords do not match");
 			}
 
-			await authService.signUp(email, password);
+			const { user, session } = await authService.signUp(email, password);
+
+			dispatch(setSession(session));
+			dispatch(setUser(user));
 			handleOpenChange(false);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "An error occurred");
@@ -157,15 +160,8 @@ export default function AuthModal() {
 							</Button>
 						</form>
 
-						<div className="relative">
-							<div className="absolute inset-0 flex items-center">
-								<span className="w-full border-t" />
-							</div>
-							<div className="relative flex justify-center text-xs uppercase">
-								<span className="bg-snow px-2 text-muted-foreground">
-									Or continue with
-								</span>
-							</div>
+						<div className="flex justify-center text-xs uppercase">
+							<span className="text-muted-foreground">Or continue with</span>
 						</div>
 
 						<div className="grid grid-cols-3 gap-3">
@@ -262,15 +258,8 @@ export default function AuthModal() {
 							</Button>
 						</form>
 
-						<div className="relative">
-							<div className="absolute inset-0 flex items-center">
-								<span className="w-full border-t" />
-							</div>
-							<div className="relative flex justify-center text-xs uppercase">
-								<span className="bg-snow px-2 text-muted-foreground">
-									Or continue with
-								</span>
-							</div>
+						<div className="flex justify-center text-xs uppercase">
+							<span className="text-muted-foreground">Or continue with</span>
 						</div>
 
 						<div className="grid grid-cols-3 gap-3">

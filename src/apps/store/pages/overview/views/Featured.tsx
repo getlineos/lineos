@@ -131,9 +131,9 @@ const recommendedApps = [
 export default function Featured() {
 	return (
 		<div className="space-y-8 mt-8">
-			<section className="space-y-4 bg-white rounded-lg p-4">
+			<section className="space-y-4 rounded-[20px] bg-white p-4 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]">
 				<div className="flex items-center justify-between">
-					<h2 className="text-2xl font-bold">Featured</h2>
+					<h2 className="text-2xl font-semibold tracking-normal">Featured</h2>
 					<Button variant="ghost" size="sm" asChild>
 						<Link to="#" className="flex items-center gap-1">
 							Show all <ChevronRight className="h-4 w-4" />
@@ -144,8 +144,8 @@ export default function Featured() {
 					{featuredApps.map((app) => (
 						<Link
 							key={app.id}
-							to={`/app/${app.id}`}
-							className="group rounded-xl overflow-hidden border hover:shadow-md transition-all"
+							to={`/store/app/${app.id}`}
+							className="group overflow-hidden rounded-[18px] bg-white shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_38px_rgba(0,0,0,0.09)]"
 						>
 							<div className="relative h-40 w-full">
 								<img
@@ -160,7 +160,7 @@ export default function Featured() {
 									alt={app.name}
 									width={60}
 									height={60}
-									className="rounded-xl"
+									className="rounded-[14px]"
 								/>
 								<div>
 									<h3 className="font-medium">{app.name}</h3>
@@ -179,9 +179,9 @@ export default function Featured() {
 			</section>
 
 			{/* Top Games & Apps */}
-			<section className="space-y-4 bg-white rounded-lg p-4">
+			<section className="space-y-4 rounded-[20px] bg-white p-4 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]">
 				<div className="flex items-center justify-between">
-					<h2 className="text-2xl font-bold">Top Games & Apps</h2>
+					<h2 className="text-2xl font-semibold tracking-normal">Top Games & Apps</h2>
 					<Button variant="ghost" size="sm" asChild>
 						<Link to="#" className="flex items-center gap-1">
 							Show all <ChevronRight className="h-4 w-4" />
@@ -250,9 +250,9 @@ export default function Featured() {
 			</section>
 
 			{/* Recommended for you */}
-			<section className="space-y-4 bg-white rounded-lg p-4">
+			<section className="space-y-4 rounded-[20px] bg-white p-4 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]">
 				<div className="flex items-center justify-between">
-					<h2 className="text-2xl font-bold">Recommended for you</h2>
+					<h2 className="text-2xl font-semibold tracking-normal">Recommended for you</h2>
 					<Button variant="ghost" size="sm" asChild>
 						<Link to="#" className="flex items-center gap-1">
 							Show all <ChevronRight className="h-4 w-4" />

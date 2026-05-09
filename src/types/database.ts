@@ -5,8 +5,8 @@ export type AppStatus = "draft" | "pending_review" | "approved" | "rejected";
 export type AssetType = "icon" | "screenshot" | "preview_video";
 
 export interface App {
-	id: string;
-	user_id: string;
+	id: number;
+	user_id: number;
 	name: string;
 	subtitle?: string;
 	description: string;
@@ -34,8 +34,8 @@ export interface App {
 }
 
 export interface AppAsset {
-	id: string;
-	app_id: string;
+	id: number;
+	app_id: number;
 	asset_type: AssetType;
 	file_path: string;
 	file_size: number;
@@ -45,16 +45,16 @@ export interface AppAsset {
 }
 
 export interface AppTerritory {
-	id: string;
-	app_id: string;
+	id: number;
+	app_id: number;
 	territory_code: string;
 	created_at: string;
 }
 
 export interface AppReview {
-	id: string;
-	app_id: string;
-	reviewer_id: string;
+	id: number;
+	app_id: number;
+	reviewer_id: number;
 	status: AppStatus;
 	feedback?: string;
 	created_at: string;

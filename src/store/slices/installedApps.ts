@@ -25,10 +25,24 @@ const installedAppsSlice = createSlice({
 			storage.prepend("installedApps", action.payload);
 			state.apps.unshift(action.payload);
 		},
-		removeInstalledApp: (state, action: PayloadAction<string>) => {
+		removeInstalledApp: (state, action: PayloadAction<string | number>) => {
 			const currentApps = storage.get("installedApps") ?? [];
 			const updatedApps = currentApps.filter(
 				(app: AppConfig) => app.id !== action.payload
+			);
+			state.apps = updatedApps;
+			storage.set("installedApps", updatedApps);
+		},
+		pinAppToDock: (state, action: PayloadAction<string>) => {
+			const updatedApps = state.apps.map((app) =>
+				app.slug === action.payload ? { ...app, showInDock: true } : app
+			);
+			state.apps = updatedApps;
+			storage.set("installedApps", updatedApps);
+		},
+		unpinAppFromDock: (state, action: PayloadAction<string>) => {
+			const updatedApps = state.apps.map((app) =>
+				app.slug === action.payload ? { ...app, showInDock: false } : app
 			);
 			state.apps = updatedApps;
 			storage.set("installedApps", updatedApps);
@@ -46,6 +60,8 @@ export const {
 	setInstalledApps,
 	addInstalledApp,
 	removeInstalledApp,
+	pinAppToDock,
+	unpinAppFromDock,
 	setLoading,
 	setError,
 } = installedAppsSlice.actions;

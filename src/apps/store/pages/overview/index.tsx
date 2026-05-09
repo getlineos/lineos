@@ -8,15 +8,15 @@ import Trending from "./views/Trending";
 
 export default function OverviewPage() {
 	return (
-		<div className="grid grid-cols-3 gap-6">
-			<div className="col-span-2">
+		<div className="grid grid-cols-1 gap-8 xl:grid-cols-[minmax(0,1fr)_320px]">
+			<div className="min-w-0">
 				<FeaturedApps />
 				<Categories />
 				<Recommended />
 				<TopApps />
 				<Featured />
 			</div>
-			<div className="col-span-1">
+			<div className="min-w-0 space-y-6">
 				<Trending />
 				<Ad />
 			</div>
