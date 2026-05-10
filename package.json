@@ -9,7 +9,7 @@
 		"dev:api": "node ./server/index.mjs",
 		"db:generate": "prisma generate",
 		"db:migrate": "node ./server/migrate.mjs",
-		"build": "tsc -b && vite build",
+		"build": "npm run db:generate && tsc -b && vite build",
 		"lint": "eslint .",
 		"preview": "vite preview"
 	},

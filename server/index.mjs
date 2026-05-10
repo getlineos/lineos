@@ -127,6 +127,7 @@ async function canReadApp(appId, user) {
 function sendJson(res, status, body, headers = {}) {
 	res.writeHead(status, {
 		"Content-Type": "application/json; charset=utf-8",
+		"Cache-Control": "no-store",
 		...headers,
 	});
 	res.end(JSON.stringify(body));
@@ -146,6 +147,18 @@ function readBody(req) {
 }
 
 async function readJson(req) {
+	if (req.body !== undefined && req.body !== null) {
+		if (typeof req.body === "string") {
+			return req.body ? JSON.parse(req.body) : {};
+		}
+
+		if (Buffer.isBuffer(req.body)) {
+			return req.body.length ? JSON.parse(req.body.toString("utf8")) : {};
+		}
+
+		return req.body;
+	}
+
 	const body = await readBody(req);
 	if (body.length === 0) {
 		return {};
@@ -843,7 +856,7 @@ async function handleUploads(req, res, pathname) {
 	return true;
 }
 
-const server = http.createServer(async (req, res) => {
+export async function handleRequest(req, res) {
 	try {
 		const url = new URL(req.url ?? "/", `http://${req.headers.host}`);
 
@@ -871,8 +884,12 @@ const server = http.createServer(async (req, res) => {
 			error instanceof Error ? error.message : "Server error"
 		);
 	}
-});
+}
 
-server.listen(port, "127.0.0.1", () => {
-	console.log(`[lineos-api] listening on http://127.0.0.1:${port}`);
-});
+if (process.argv[1] && path.resolve(process.argv[1]) === __filename) {
+	const server = http.createServer(handleRequest);
+
+	server.listen(port, "127.0.0.1", () => {
+		console.log(`[lineos-api] listening on http://127.0.0.1:${port}`);
+	});
+}

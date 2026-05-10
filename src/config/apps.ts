@@ -217,6 +217,7 @@ export const apps: AppConfig[] = [
 		icon: MailIcon,
 		slug: "mail",
 		url: "https://mail.google.com",
+		showInDock: true,
 		showInLaunchpad: true,
 		allow:
 			"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
@@ -236,6 +237,7 @@ export const apps: AppConfig[] = [
 	{
 		name: "Calendar",
 		icon: CalendarIcon,
+		showInDock: true,
 		showInLaunchpad: true,
 		slug: "calendar",
 	},
@@ -256,7 +258,6 @@ export const apps: AppConfig[] = [
 	{
 		name: "FaceTime",
 		icon: FaceTimeIcon,
-		showInDock: true,
 		showInLaunchpad: true,
 		slug: "facetime",
 	},
@@ -270,7 +271,6 @@ export const apps: AppConfig[] = [
 	{
 		name: "Music",
 		icon: MusicIcon,
-		showInDock: true,
 		showInLaunchpad: true,
 		slug: "music",
 		url: getStandaloneAppUrl("music"),
@@ -300,7 +300,6 @@ export const apps: AppConfig[] = [
 	{
 		name: "PDFToolkit",
 		icon: PDFToolkitIcon,
-		showInDock: true,
 		showInLaunchpad: true,
 		slug: "pdf-toolkit",
 		url: getStandaloneAppUrl("pdf-toolkit"),
@@ -310,21 +309,18 @@ export const apps: AppConfig[] = [
 	{
 		name: "Contacts",
 		icon: ContactsIcon,
-		showInDock: true,
 		showInLaunchpad: true,
 		slug: "contacts",
 	},
 	{
 		name: "Reminders",
 		icon: RemindersIcon,
-		showInDock: true,
 		showInLaunchpad: true,
 		slug: "reminders",
 	},
 	{
 		name: "TV",
 		icon: TVIcon,
-		showInDock: true,
 		showInLaunchpad: true,
 		slug: "tv",
 	},
@@ -351,28 +347,24 @@ export const apps: AppConfig[] = [
 	{
 		name: "Voice Memos",
 		icon: VoiceMemosIcon,
-		showInDock: true,
 		showInLaunchpad: true,
 		slug: "voice-memos",
 	},
 	{
 		name: "Preview",
 		icon: PreviewIcon,
-		showInDock: true,
 		showInLaunchpad: true,
 		slug: "preview",
 	},
 	{
 		name: "TextEdit",
 		icon: TextEditIcon,
-		showInDock: true,
 		showInLaunchpad: true,
 		slug: "textedit",
 	},
 	{
 		name: "Terminal",
 		icon: TerminalIcon,
-		showInDock: true,
 		showInLaunchpad: true,
 		slug: "terminal",
 	},
@@ -463,6 +455,7 @@ export const apps: AppConfig[] = [
 	{
 		name: "Settings",
 		icon: SettingsIcon,
+		showInDock: true,
 		showInLaunchpad: true,
 		slug: "settings",
 	},
@@ -524,7 +517,7 @@ export function getDevApps() {
 			.filter((app: DevIframeApp) => app.slug !== "pdf-toolkit")
 			.map((app: DevIframeApp) => ({
 				name: getAppName(app.slug),
-				showInDock: true,
+				showInDock: false,
 				showInLaunchpad: true,
 				slug: app.slug,
 				url: getStandaloneAppUrl(app.slug),
