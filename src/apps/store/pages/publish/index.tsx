@@ -11,7 +11,14 @@ import SubmissionCard from "./views/SubmissionCard";
 export default function PublishPage() {
 	const form = useForm<AppSubmissionForm>({
 		resolver: zodResolver(appSubmissionSchema),
-		defaultValues: {},
+		defaultValues: {
+			name: "",
+			description: "",
+			category: "",
+			appUrl: "",
+			icon: "",
+			screenshots: [],
+		},
 	});
 
 	return (

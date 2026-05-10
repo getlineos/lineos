@@ -12,15 +12,13 @@ export const appSubmissionSchema = z.object({
 	contactEmail: z.string().email("Must be a valid email").optional(),
 	appUrl: z.string().url("Must be a valid URL"),
 	icon: z.string().min(1, "App icon is required"),
-	screenshots: z
-		.array(
-			z.object({
-				url: z.string().url().or(z.string().startsWith("/uploads/")),
-				name: z.string(),
-				fileSize: z.number().optional(),
-			})
-		)
-		.default([]),
+	screenshots: z.array(
+		z.object({
+			url: z.string().url().or(z.string().startsWith("/uploads/")),
+			name: z.string(),
+			fileSize: z.number().optional(),
+		})
+	),
 });
 
 export type AppSubmissionForm = z.infer<typeof appSubmissionSchema>;

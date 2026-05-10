@@ -17,7 +17,7 @@ export default function CalculatorApp() {
 	const [storedValue, setStoredValue] = useState<number | null>(null);
 	const [pendingOperator, setPendingOperator] = useState<Operator | null>(null);
 	const [waitingForOperand, setWaitingForOperand] = useState(false);
-	const [history, setHistory] = useState();
+	const [history, setHistory] = useState<string>("");
 	const [position, setPosition] = useState({ x: 88, y: 56 });
 
 	const parsedDisplay = Number(display);
