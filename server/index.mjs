@@ -1,5 +1,4 @@
 import crypto from "node:crypto";
-import fs from "node:fs/promises";
 import http from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -12,7 +11,6 @@ const rootDir = path.resolve(__dirname, "..");
 const port = Number(process.env.CORE_API_PORT ?? 5177);
 const sessionCookieName = "lineos_session";
 const authSecret = process.env.AUTH_SECRET ?? "lineos-dev-secret";
-const uploadDir = path.join(rootDir, "public", "uploads", "app-images");
 
 const appColumns = [
 	"name",
@@ -165,6 +163,39 @@ async function readJson(req) {
 	}
 
 	return JSON.parse(body.toString("utf8"));
+}
+
+function getHeaderEntries(headers) {
+	return Object.entries(headers).flatMap(([key, value]) => {
+		if (Array.isArray(value)) {
+			return value.map((item) => [key, item]);
+		}
+
+		if (value === undefined) {
+			return [];
+		}
+
+		return [[key, value]];
+	});
+}
+
+function getRequestBody(req) {
+	if (req.body !== undefined && req.body !== null) {
+		return req.body;
+	}
+
+	return req;
+}
+
+async function readFormData(req, pathname) {
+	const webRequest = new Request(`http://127.0.0.1:${port}${pathname}`, {
+		method: req.method,
+		headers: getHeaderEntries(req.headers),
+		body: getRequestBody(req),
+		duplex: "half",
+	});
+
+	return webRequest.formData();
 }
 
 function parseCookies(req) {
@@ -805,14 +836,7 @@ async function handleUploads(req, res, pathname) {
 		return true;
 	}
 
-	await fs.mkdir(uploadDir, { recursive: true });
-	const webRequest = new Request(`http://127.0.0.1:${port}${pathname}`, {
-		method: req.method,
-		headers: req.headers,
-		body: req,
-		duplex: "half",
-	});
-	const formData = await webRequest.formData();
+	const formData = await readFormData(req, pathname);
 	const file = formData.get("file");
 	if (!file || typeof file === "string") {
 		sendError(res, 400, "File is required");
@@ -828,7 +852,6 @@ async function handleUploads(req, res, pathname) {
 		contentType: file.type,
 		fileName: file.name,
 		rootDir,
-		uploadDir,
 		prefix: pathname === "/api/uploads/app-icons" ? "icon" : "asset",
 	});
 

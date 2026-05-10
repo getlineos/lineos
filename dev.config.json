@@ -2,7 +2,13 @@
   "proxyPort": 5176,
   "lineosPort": 5175,
   "apps": [
-    { "slug": "json-formatter", "dir": "apps/apps/json-formatter", "port": 5178 },
-    { "slug": "pdf-toolkit", "dir": "apps/apps/pdf-toolkit", "port": 5179 }
+    {
+      "slug": "json-formatter",
+      "dir": "apps/apps/json-formatter",
+      "port": 5178
+    },
+    { "slug": "pdf-toolkit", "dir": "apps/apps/pdf-toolkit", "port": 5179 },
+    { "slug": "image-toolkit", "dir": "apps/apps/image-toolkit", "port": 5180 },
+    { "slug": "loop", "dir": "apps/apps/loop", "port": 5181 }
   ]
 }

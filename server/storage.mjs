@@ -1,8 +1,23 @@
 import crypto from "node:crypto";
-import fs from "node:fs/promises";
-import path from "node:path";
 
-const storageDriver = (process.env.FILE_STORAGE_DRIVER ?? "local").toLowerCase();
+function resolveStorageDriver() {
+	const explicitDriver = process.env.FILE_STORAGE_DRIVER?.toLowerCase();
+	if (explicitDriver) {
+		return explicitDriver;
+	}
+
+	if (process.env.IMGBB_API_KEY) {
+		return "imgbb";
+	}
+
+	if (process.env.S3_BUCKET) {
+		return "s3";
+	}
+
+	return null;
+}
+
+const storageDriver = resolveStorageDriver();
 
 function getExtension(fileName, contentType) {
 	const extension = fileName?.split(".").pop();
@@ -17,19 +32,6 @@ function createObjectName(prefix, fileName, contentType) {
 	return `${prefix}-${Date.now()}-${crypto
 		.randomBytes(4)
 		.toString("hex")}.${getExtension(fileName, contentType)}`;
-}
-
-async function uploadLocal({ buffer, contentType, fileName, uploadDir, prefix }) {
-	await fs.mkdir(uploadDir, { recursive: true });
-	const safeName = createObjectName(prefix, fileName, contentType);
-	const diskPath = path.join(uploadDir, safeName);
-	await fs.writeFile(diskPath, buffer);
-
-	return {
-		url: `/uploads/app-images/${safeName}`,
-		storageKey: safeName,
-		driver: "local",
-	};
 }
 
 async function uploadImgbb({ buffer, contentType, fileName }) {
@@ -119,18 +121,13 @@ export async function uploadImage(options) {
 		return uploadS3(options);
 	}
 
-	return uploadLocal(options);
+	throw new Error(
+		"Image uploads require external storage. Set IMGBB_API_KEY or configure FILE_STORAGE_DRIVER=s3 with S3_BUCKET."
+	);
 }
 
-export async function deleteImageByUrl(url, rootDir) {
+export async function deleteImageByUrl(url) {
 	if (!url) {
 		return;
-	}
-
-	if (
-		url.startsWith("/uploads/app-images/") ||
-		url.startsWith("/uploads/app-icons/")
-	) {
-		await fs.rm(path.join(rootDir, "public", url.slice(1)), { force: true });
 	}
 }
