@@ -41,8 +41,14 @@ import XcodeIcon from "../assets/img/icons/xcode.png";
 import TrashIcon from "../assets/img/icons/trash.png";
 import LoopIcon from "../assets/img/icons/loop.png";
 import PDFToolkitIcon from "../assets/img/icons/pdf-toolkit.svg";
-import devConfig from "../../../apps/dev.config.json";
+import devConfig from "../../dev.config.json";
 import { useNavigate } from "react-router";
+
+type DevIframeApp = {
+	slug: string;
+	dir?: string;
+	port?: number;
+};
 import storage from "@/utils/storage";
 import { store } from "@/store/persistence";
 import { setInstalledApps } from "@/store/slices/installedApps";
@@ -186,7 +192,9 @@ function mergeInstalledAppConfig(
 
 const getStandaloneAppUrl = (appName: string) => {
 	if (import.meta.env.DEV) {
-		const entry = devConfig.apps?.find((app) => app.slug === appName);
+		const entry = devConfig.apps?.find(
+			(app: DevIframeApp) => app.slug === appName
+		);
 		if (entry && typeof entry.port === "number") {
 			return `http://127.0.0.1:${entry.port}/${appName}/`;
 		}
@@ -513,8 +521,8 @@ function getAppName(slug: string) {
 export function getDevApps() {
 	if (isLocalDevHost()) {
 		return devConfig.apps
-			.filter((app) => app.slug !== "pdf-toolkit")
-			.map((app) => ({
+			.filter((app: DevIframeApp) => app.slug !== "pdf-toolkit")
+			.map((app: DevIframeApp) => ({
 				name: getAppName(app.slug),
 				showInDock: true,
 				showInLaunchpad: true,

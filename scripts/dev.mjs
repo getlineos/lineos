@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const lineosDir = path.resolve(__dirname, "..");
 const repoRoot = path.resolve(__dirname, "..", "..");
-const configPath = path.join(repoRoot, "apps", "dev.config.json");
+const configPath = path.join(lineosDir, "dev.config.json");
 
 const childProcesses = [];
 
@@ -51,13 +51,13 @@ function runProcess(label, args, spawnOptions = {}) {
 function resolveAppDir(app, rootDir) {
 	if (!app.dir) {
 		throw new Error(
-			`App "${app.slug}" is missing a dir in apps/dev.config.json`
+			`App "${app.slug}" is missing a dir in lineos/dev.config.json`
 		);
 	}
 
 	if (!app.port) {
 		throw new Error(
-			`App "${app.slug}" is missing a port in apps/dev.config.json`
+			`App "${app.slug}" is missing a port in lineos/dev.config.json`
 		);
 	}
 

@@ -1,0 +1,8 @@
+{
+  "proxyPort": 5176,
+  "lineosPort": 5175,
+  "apps": [
+    { "slug": "json-formatter", "dir": "apps/apps/json-formatter", "port": 5178 },
+    { "slug": "pdf-toolkit", "dir": "apps/apps/pdf-toolkit", "port": 5179 }
+  ]
+}
