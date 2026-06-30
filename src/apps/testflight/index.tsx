@@ -54,31 +54,6 @@ const statusCopy: Record<
 	},
 };
 
-const seedBetaApps: BetaApp[] = [
-	{
-		id: "tf-lineos-docs",
-		name: "LineOS Docs",
-		developer: "LineOS Labs",
-		version: "0.4.2",
-		build: "142",
-		url: "https://lineos.dev",
-		status: "ready",
-		expiresAt: dayjs().add(18, "day").toISOString(),
-		updatedAt: dayjs().subtract(2, "hour").toISOString(),
-	},
-	{
-		id: "tf-loop-preview",
-		name: "Loop Preview",
-		developer: "LineOS Labs",
-		version: "1.1.0",
-		build: "88",
-		url: "https://example.com",
-		status: "ready",
-		expiresAt: dayjs().add(24, "day").toISOString(),
-		updatedAt: dayjs().subtract(1, "day").toISOString(),
-	},
-];
-
 export default function TestFlightApp() {
 	const [betaApps, setBetaApps] = useState<BetaApp[]>(readBetaApps);
 	const [selectedAppId, setSelectedAppId] = useState(betaApps[0]?.id ?? "");
@@ -110,7 +85,10 @@ export default function TestFlightApp() {
 		const url = new URL(normalizedUrl);
 		const name = appName.trim() || titleFromHost(url.hostname);
 		const slugBase = `testflight-${slugify(name)}`;
-		const slug = uniqueSlug(slugBase, betaApps.map((app) => app.id));
+		const slug = uniqueSlug(
+			slugBase,
+			betaApps.map((app) => app.id)
+		);
 		const now = dayjs();
 		const nextApp: BetaApp = {
 			id: slug,
@@ -226,7 +204,9 @@ export default function TestFlightApp() {
 				{!isSidebarCollapsed && (
 					<div className="border-b border-black/5 p-4">
 						<div className="rounded-2xl border border-black/10 bg-white/80 p-3 shadow-sm">
-							<div className="mb-3 text-sm font-semibold">Register beta app</div>
+							<div className="mb-3 text-sm font-semibold">
+								Register beta app
+							</div>
 							<div className="space-y-2">
 								<Input
 									value={appName}
@@ -291,10 +271,7 @@ export default function TestFlightApp() {
 											: "hover:bg-black/5"
 									)}
 								>
-									<AppInitials
-										name={app.name}
-										flat={isSidebarCollapsed}
-									/>
+									<AppInitials name={app.name} flat={isSidebarCollapsed} />
 									{!isSidebarCollapsed && (
 										<>
 											<div className="min-w-0 flex-1">
@@ -357,8 +334,8 @@ export default function TestFlightApp() {
 											Ready to test
 										</h3>
 										<p className="mt-2 text-sm leading-6 text-[#6e6e73]">
-											Click Run to load this beta URL in the TestFlight
-											preview canvas.
+											Click Run to load this beta URL in the TestFlight preview
+											canvas.
 										</p>
 										<div className="mt-5 grid grid-cols-2 gap-3 rounded-2xl border border-black/10 bg-[#f7f7f9] p-3 text-left text-sm">
 											<div>
@@ -460,8 +437,8 @@ function readBetaApps(): BetaApp[] {
 		return storedApps;
 	}
 
-	storage.set(TESTFLIGHT_APPS_KEY, seedBetaApps);
-	return seedBetaApps;
+	storage.set(TESTFLIGHT_APPS_KEY, []);
+	return [];
 }
 
 function normalizeUrl(url: string) {
