@@ -3,6 +3,7 @@ import CalendarApp from "@/apps/calendar";
 import CalculatorApp from "@/apps/calculator";
 import NotesApp from "@/apps/notes";
 import SettingsApp from "@/apps/settings";
+import TestFlightApp from "@/apps/testflight";
 import Store from "@/apps/store";
 import "@/assets/css/index.css";
 import wallpaper from "@/assets/img/wallpaper.jpg";
@@ -45,6 +46,7 @@ export default function App() {
 						<Route path="calendar" element={<CalendarApp />} />
 						<Route path="notes" element={<NotesApp />} />
 						<Route path="settings" element={<SettingsApp />} />
+						<Route path="testflight" element={<TestFlightApp />} />
 						<Route path="store/*" element={<Store />} />
 						<Route path="/:slug" element={<DynamicApp />} />
 					</Route>

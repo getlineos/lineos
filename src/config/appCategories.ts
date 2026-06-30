@@ -48,6 +48,7 @@ const categoryBySlug: Record<string, AppCategory> = {
 	textedit: "Productivity",
 	terminal: "Developer Tools",
 	developer: "Developer Tools",
+	testflight: "Developer Tools",
 	xcode: "Developer Tools",
 	dictionary: "Productivity",
 	garageband: "Creativity",

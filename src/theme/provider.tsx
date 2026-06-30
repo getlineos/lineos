@@ -19,6 +19,7 @@ type ThemeContextValue = {
 	themeId: ThemeId;
 	hasChosenTheme: boolean;
 	customTheme: CustomTheme;
+	previewTheme: (themeId: ThemeId) => void;
 	setTheme: (themeId: ThemeId) => void;
 	saveCustomTheme: (customTheme: CustomTheme) => void;
 };
@@ -59,8 +60,9 @@ function readCustomTheme(): CustomTheme {
 
 export function LineOSThemeProvider({ children }: { children: ReactNode }) {
 	const [themeState, setThemeState] = useState(readStoredTheme);
+	const [previewThemeId, setPreviewThemeId] = useState<ThemeId | null>(null);
 	const [customTheme, setCustomTheme] = useState(readCustomTheme);
-	const theme = resolveTheme(themeState.themeId);
+	const theme = resolveTheme(previewThemeId ?? themeState.themeId);
 
 	useEffect(() => {
 		document.documentElement.dataset.lineosTheme = theme.id;
@@ -78,9 +80,15 @@ export function LineOSThemeProvider({ children }: { children: ReactNode }) {
 		customStyle.textContent = customTheme.css;
 	}, [customTheme.css]);
 
+	const previewTheme = useCallback((themeId: ThemeId) => {
+		const nextTheme = resolveTheme(themeId);
+		setPreviewThemeId(nextTheme.id);
+	}, []);
+
 	const setTheme = useCallback((themeId: ThemeId) => {
 		const nextTheme = resolveTheme(themeId);
 		window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme.id);
+		setPreviewThemeId(null);
 		setThemeState({ themeId: nextTheme.id, hasChosenTheme: true });
 	}, []);
 
@@ -98,10 +106,18 @@ export function LineOSThemeProvider({ children }: { children: ReactNode }) {
 			themeId: theme.id,
 			hasChosenTheme: themeState.hasChosenTheme,
 			customTheme,
+			previewTheme,
 			setTheme,
 			saveCustomTheme,
 		}),
-		[customTheme, saveCustomTheme, setTheme, theme, themeState.hasChosenTheme]
+		[
+			customTheme,
+			previewTheme,
+			saveCustomTheme,
+			setTheme,
+			theme,
+			themeState.hasChosenTheme,
+		]
 	);
 
 	return (
@@ -117,4 +133,3 @@ export function useLineOSTheme() {
 
 	return context;
 }
-

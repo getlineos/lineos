@@ -10,7 +10,7 @@ export const themes: ThemeConfig[] = [
 		description: "A clean app launcher with your apps front and center.",
 		shell: "launchpad",
 		accent: "#2563eb",
-		previewClassName: "from-slate-50 via-white to-blue-50",
+		previewClassName: "from-sky-100 via-white to-blue-200",
 	},
 	{
 		id: "macos",
@@ -61,4 +61,3 @@ export function resolveTheme(themeId: string | null | undefined) {
 
 	return themeById.default;
 }
-

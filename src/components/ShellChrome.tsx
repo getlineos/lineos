@@ -3,7 +3,15 @@ import Menubar from "@/components/Menubar";
 import { Button } from "@/components/ui/button";
 import { useLineOSTheme } from "@/theme/provider";
 import { cn } from "@/utils";
-import { Grid3X3, Monitor, Search } from "lucide-react";
+import {
+	ArrowLeft,
+	Grid3X3,
+	Home,
+	Monitor,
+	Search,
+	Settings,
+} from "lucide-react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 
 type ShellChromeProps = {
@@ -43,7 +51,82 @@ export default function ShellChrome({ isHome, children }: ShellChromeProps) {
 		);
 	}
 
-	return <div>{children}</div>;
+	return (
+		<div>
+			{children}
+			{!isHome && <DefaultAssistiveMenu />}
+		</div>
+	);
+}
+
+function DefaultAssistiveMenu() {
+	const navigate = useNavigate();
+	const [isOpen, setIsOpen] = useState(false);
+
+	const actions = [
+		{
+			label: "Home",
+			icon: Home,
+			onClick: () => navigate("/"),
+			className: "bg-slate-950 text-white",
+		},
+		{
+			label: "Launcher",
+			icon: Grid3X3,
+			onClick: () => navigate("/launchpad"),
+			className: "bg-white text-slate-950",
+		},
+		{
+			label: "Settings",
+			icon: Settings,
+			onClick: () => navigate("/settings"),
+			className: "bg-white text-slate-950",
+		},
+		{
+			label: "Back",
+			icon: ArrowLeft,
+			onClick: () => navigate(-1),
+			className: "bg-white text-slate-950",
+		},
+	];
+
+	return (
+		<>
+			<div
+				className="fixed left-0 top-1/2 z-[1000] h-48 w-2.5 -translate-y-1/2"
+				aria-hidden="true"
+				onMouseEnter={() => setIsOpen(true)}
+			/>
+			<div
+				className={cn(
+					"fixed left-2.5 top-1/2 z-[1000] -translate-y-1/2 transition-all duration-200",
+					isOpen
+						? "pointer-events-auto translate-x-0 opacity-100"
+						: "pointer-events-none -translate-x-full opacity-0"
+				)}
+				onMouseLeave={() => setIsOpen(false)}
+			>
+				<div className="rounded-[2rem] border border-white/50 bg-white/55 p-2 shadow-2xl shadow-slate-900/20 backdrop-blur-2xl">
+					<div className="flex flex-col gap-3">
+						{actions.map(({ label, icon: Icon, onClick, className }) => (
+							<button
+								key={label}
+								type="button"
+								aria-label={label}
+								className={cn(
+									"flex h-14 w-14 items-center justify-center rounded-full shadow-lg shadow-slate-900/10 transition hover:scale-105 active:scale-95",
+									className
+								)}
+								onClick={onClick}
+							>
+								<Icon className="h-6 w-6" />
+							</button>
+						))}
+					</div>
+				</div>
+			</div>
+		</>
+	);
 }
 
 function WindowsTaskbar() {

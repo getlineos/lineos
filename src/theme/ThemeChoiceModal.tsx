@@ -10,15 +10,21 @@ import { themes } from "@/theme/config";
 import type { ThemeId } from "@/theme/types";
 import { cn } from "@/utils";
 import { Check } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLineOSTheme } from "./provider";
 
 export default function ThemeChoiceModal() {
-	const { hasChosenTheme, setTheme, themeId } = useLineOSTheme();
+	const { hasChosenTheme, previewTheme, setTheme, themeId } = useLineOSTheme();
 	const selectableThemes = themes.filter((theme) => theme.id !== "custom");
 	const [selectedTheme, setSelectedTheme] = useState<ThemeId>(
 		themeId === "custom" ? "default" : themeId
 	);
+
+	useEffect(() => {
+		if (!hasChosenTheme) {
+			previewTheme(selectedTheme);
+		}
+	}, [hasChosenTheme, previewTheme, selectedTheme]);
 
 	const chooseTheme = () => {
 		setTheme(selectedTheme);
@@ -52,18 +58,10 @@ export default function ThemeChoiceModal() {
 								)}
 								onClick={() => setSelectedTheme(theme.id)}
 							>
-								<div
-									className={cn(
-										"mb-3 flex h-20 items-end rounded-md bg-gradient-to-br p-2",
-										theme.previewClassName
-									)}
-								>
-									<div className="flex gap-1.5">
-										<div className="h-5 w-5 rounded bg-white/90 shadow" />
-										<div className="h-5 w-5 rounded bg-white/75 shadow" />
-										<div className="h-5 w-5 rounded bg-white/60 shadow" />
-									</div>
-								</div>
+								<ThemePreview
+									themeId={theme.id}
+									className={theme.previewClassName}
+								/>
 								<div className="flex items-center justify-between gap-2">
 									<span className="text-sm font-semibold">{theme.name}</span>
 									{isSelected && <Check className="h-4 w-4 text-blue-600" />}
@@ -80,5 +78,40 @@ export default function ThemeChoiceModal() {
 				</div>
 			</DialogContent>
 		</Dialog>
+	);
+}
+
+function ThemePreview({
+	themeId,
+	className,
+}: {
+	themeId: ThemeId;
+	className: string;
+}) {
+	if (themeId === "default") {
+		return (
+			<div className="mb-3 flex h-20 items-end rounded-md border border-sky-200/80 bg-[linear-gradient(135deg,#eef7ff_0%,#f8fbff_48%,#dbeafe_100%)] p-2 shadow-inner">
+				<div className="flex gap-1.5">
+					<div className="h-5 w-5 rounded-md bg-gradient-to-br from-sky-400 to-blue-600 shadow ring-1 ring-white/90" />
+					<div className="h-5 w-5 rounded-md bg-gradient-to-br from-emerald-300 to-teal-500 shadow ring-1 ring-white/90" />
+					<div className="h-5 w-5 rounded-md bg-gradient-to-br from-amber-300 to-orange-500 shadow ring-1 ring-white/90" />
+				</div>
+			</div>
+		);
+	}
+
+	return (
+		<div
+			className={cn(
+				"mb-3 flex h-20 items-end rounded-md bg-gradient-to-br p-2",
+				className
+			)}
+		>
+			<div className="flex gap-1.5">
+				<div className="h-5 w-5 rounded bg-white/90 shadow" />
+				<div className="h-5 w-5 rounded bg-white/75 shadow" />
+				<div className="h-5 w-5 rounded bg-white/60 shadow" />
+			</div>
+		</div>
 	);
 }
