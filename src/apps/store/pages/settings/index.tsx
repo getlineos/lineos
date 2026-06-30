@@ -20,18 +20,24 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { themes } from "@/theme/config";
+import { useLineOSTheme } from "@/theme/provider";
+import { cn } from "@/utils";
 import {
 	Accessibility,
 	Bell,
+	Check,
 	Code,
 	Download,
 	HelpCircle,
 	Monitor,
-	Moon,
+	Palette,
 	Shield,
-	Sun,
+	Upload,
 	User,
 } from "lucide-react";
+import { useState } from "react";
 import { myApps } from "../../utils";
 import Account from "./views/Account";
 import Developer from "./views/Developer";
@@ -39,6 +45,27 @@ import Privacy from "./views/Privacy";
 import Notifications from "./views/Notifications";
 
 export default function Settings() {
+	const { themeId, setTheme, customTheme, saveCustomTheme } = useLineOSTheme();
+	const [customCss, setCustomCss] = useState(customTheme.css);
+
+	const handleThemeFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files?.[0];
+		if (!file) {
+			return;
+		}
+
+		const reader = new FileReader();
+		reader.onload = () => {
+			setCustomCss(String(reader.result ?? ""));
+		};
+		reader.readAsText(file);
+	};
+
+	const applyCustomTheme = () => {
+		saveCustomTheme({ name: "Custom", css: customCss });
+		setTheme("custom");
+	};
+
 	return (
 		<Tabs defaultValue="account" className="space-y-4">
 			<div className="flex">
@@ -111,31 +138,92 @@ export default function Settings() {
 						<Card>
 							<CardHeader>
 								<CardTitle>Theme</CardTitle>
-								<CardDescription>Choose your preferred theme</CardDescription>
+								<CardDescription>
+									Choose your preferred desktop style
+								</CardDescription>
 							</CardHeader>
-							<CardContent>
-								<div className="grid grid-cols-3 gap-4">
-									<div className="flex flex-col items-center gap-2">
-										<div className="border rounded-lg p-2 cursor-pointer bg-white hover:border-blue-500 hover:shadow-sm">
-											<Sun className="h-8 w-8 text-yellow-500" />
-										</div>
-										<span className="text-sm font-medium">Light</span>
-									</div>
-									<div className="flex flex-col items-center gap-2">
-										<div className="border rounded-lg p-2 cursor-pointer bg-gray-900 hover:border-blue-500 hover:shadow-sm">
-											<Moon className="h-8 w-8 text-blue-400" />
-										</div>
-										<span className="text-sm font-medium">Dark</span>
-									</div>
-									<div className="flex flex-col items-center gap-2">
-										<div className="border rounded-lg p-2 cursor-pointer bg-gradient-to-r from-white to-gray-900 hover:border-blue-500 hover:shadow-sm">
-											<div className="flex">
-												<Sun className="h-8 w-8 text-yellow-500" />
-												<Moon className="h-8 w-8 text-blue-400" />
+							<CardContent className="space-y-4">
+								<div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+									{themes.map((theme) => (
+										<button
+											key={theme.id}
+											type="button"
+											className={cn(
+												"rounded-lg border p-3 text-left transition hover:border-slate-400",
+												themeId === theme.id
+													? "border-[var(--lineos-accent)] bg-slate-50"
+													: "border-slate-200 bg-white"
+											)}
+											onClick={() => setTheme(theme.id)}
+										>
+											<div
+												className={cn(
+													"mb-3 flex h-20 items-end rounded-md bg-gradient-to-br p-2",
+													theme.previewClassName
+												)}
+											>
+												<div className="flex gap-1.5">
+													<div className="h-5 w-5 rounded bg-white/90 shadow" />
+													<div className="h-5 w-5 rounded bg-white/75 shadow" />
+													<div className="h-5 w-5 rounded bg-white/60 shadow" />
+												</div>
 											</div>
-										</div>
-										<span className="text-sm font-medium">System</span>
-									</div>
+											<div className="flex items-center justify-between gap-3">
+												<span className="font-medium">{theme.name}</span>
+												{themeId === theme.id && (
+													<Check className="h-4 w-4 text-blue-600" />
+												)}
+											</div>
+											<p className="mt-1 text-sm text-gray-500">
+												{theme.description}
+											</p>
+										</button>
+									))}
+								</div>
+							</CardContent>
+						</Card>
+
+						<Card>
+							<CardHeader>
+								<CardTitle>Custom Theme</CardTitle>
+								<CardDescription>
+									Apply CSS variables or upload a CSS file for this browser
+								</CardDescription>
+							</CardHeader>
+							<CardContent className="space-y-4">
+								<div className="space-y-2">
+									<Label htmlFor="custom-theme-css">CSS overrides</Label>
+									<Textarea
+										id="custom-theme-css"
+										value={customCss}
+										onChange={(event) => setCustomCss(event.target.value)}
+										className="min-h-40 font-mono text-xs"
+										placeholder={`:root {
+  --custom-lineos-bg: linear-gradient(135deg, #f8fafc, #dbeafe);
+  --custom-lineos-text: #0f172a;
+  --custom-lineos-accent: #2563eb;
+}`}
+									/>
+								</div>
+								<div className="flex flex-wrap items-center gap-3">
+									<Button type="button" onClick={applyCustomTheme}>
+										<Palette className="h-4 w-4" />
+										Apply Custom Theme
+									</Button>
+									<Label
+										htmlFor="custom-theme-file"
+										className="inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground"
+									>
+										<Upload className="h-4 w-4" />
+										Upload CSS
+									</Label>
+									<Input
+										id="custom-theme-file"
+										type="file"
+										accept=".css,text/css"
+										className="hidden"
+										onChange={handleThemeFile}
+									/>
 								</div>
 							</CardContent>
 						</Card>

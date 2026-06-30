@@ -9,6 +9,7 @@
     },
     { "slug": "pdf-toolkit", "dir": "apps/apps/pdf-toolkit", "port": 5179 },
     { "slug": "image-toolkit", "dir": "apps/apps/image-toolkit", "port": 5180 },
-    { "slug": "loop", "dir": "apps/apps/loop", "port": 5181 }
+    { "slug": "loop", "dir": "apps/apps/loop", "port": 5181 },
+    { "slug": "expense-tracker", "dir": "apps/apps/expense-tracker", "port": 5182 }
   ]
 }

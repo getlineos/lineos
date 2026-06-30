@@ -19,7 +19,11 @@ type ContextMenuState = {
 	y: number;
 } | null;
 
-export default function Dock() {
+type DockProps = {
+	variant?: "macos" | "ubuntu";
+};
+
+export default function Dock({ variant = "macos" }: DockProps) {
 	const navigate = useNavigate();
 	const [contextMenu, setContextMenu] = useState<ContextMenuState>(null);
 	const {
@@ -84,6 +88,7 @@ export default function Dock() {
 	};
 
 	const dockTransition = "320ms cubic-bezier(0.22, 1, 0.36, 1)";
+	const isUbuntu = variant === "ubuntu";
 
 	const getDockItemScale = (index: number) => {
 		if (hoveredIndex === null) {
@@ -106,12 +111,17 @@ export default function Dock() {
 	return (
 		<TooltipProvider delayDuration={400}>
 			<div
-				className="absolute bottom-0 left-0 top-[28px] z-[999] flex w-[72px] items-center pl-1"
+				className={cn(
+					"fixed bottom-0 left-0 z-[999] flex w-[72px] items-center pl-1",
+					isUbuntu ? "top-[32px]" : "top-[28px]"
+				)}
 				onClick={() => navigate("/")}
 			>
 				<div
 					className={cn(
 						"w-[59px] min-h-[60px] overflow-visible bg-white bg-opacity-10 m-auto rounded-[18px] px-0.5 pb-1 pt-0.5 scrollbar-hide transition-all duration-300 ease-out",
+						isUbuntu &&
+							"bg-zinc-950/85 bg-opacity-100 rounded-2xl border border-white/10",
 						isDragOver && "bg-opacity-25 ring-2 ring-white/70"
 					)}
 					onDragOver={onDragOver}

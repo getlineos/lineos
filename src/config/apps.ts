@@ -62,6 +62,8 @@ export interface AppConfig {
   onClick?: (navigate: ReturnType<typeof useNavigate>) => void;
   showInDock?: boolean;
   showInLaunchpad?: boolean;
+  category?: string;
+  subcategory?: string;
   allow?: string;
   sandbox?: string;
 }
@@ -72,6 +74,8 @@ type DbApp = {
   slug: string;
   icon_url: string;
   app_url: string;
+  primary_category?: string;
+  subcategory?: string;
 };
 
 export const initializeInstalledApps = async (forceUpdate?: boolean) => {
@@ -82,10 +86,12 @@ export const initializeInstalledApps = async (forceUpdate?: boolean) => {
   const installedAppsBySlug = new Map(
     installedApps.map((app: AppConfig) => [app.slug, app]),
   );
-  const configuredApps = apps.map((app) =>
-    mergeDbAppConfig(
-      mergeInstalledAppConfig(app, installedAppsBySlug),
-      dbAppsBySlug,
+  const configuredApps = dedupeAppConfigsBySlug(
+    apps.map((app) =>
+      mergeDbAppConfig(
+        mergeInstalledAppConfig(app, installedAppsBySlug),
+        dbAppsBySlug,
+      ),
     ),
   );
 
@@ -94,7 +100,7 @@ export const initializeInstalledApps = async (forceUpdate?: boolean) => {
     storage.set("installedApps", configuredApps);
     store.dispatch(setInstalledApps(configuredApps));
   } else {
-    const mergedApps = [
+    const mergedApps = dedupeAppConfigsBySlug([
       ...configuredApps,
       ...installedApps
         .filter(
@@ -104,7 +110,7 @@ export const initializeInstalledApps = async (forceUpdate?: boolean) => {
             ),
         )
         .map((app: AppConfig) => mergeDbAppConfig(app, dbAppsBySlug)),
-    ];
+    ]);
     storage.set("installedApps", mergedApps);
     store.dispatch(setInstalledApps(mergedApps));
   }
@@ -122,6 +128,8 @@ async function getDbApps(): Promise<AppConfig[]> {
       icon: app.icon_url,
       slug: app.slug,
       url: app.app_url || getStandaloneAppUrl(app.slug),
+      category: app.primary_category,
+      subcategory: app.subcategory,
       showInDock: false,
       showInLaunchpad: true,
       sandbox: "allow-same-origin allow-scripts allow-forms",
@@ -155,6 +163,14 @@ function dedupeBySlug(apps: DbApp[]) {
   return [...appsBySlug.values()];
 }
 
+function dedupeAppConfigsBySlug(apps: AppConfig[]) {
+  const appsBySlug = new Map<string, AppConfig>();
+  for (const app of apps) {
+    appsBySlug.set(app.slug, app);
+  }
+  return [...appsBySlug.values()];
+}
+
 function mergeDbAppConfig(
   app: AppConfig,
   dbAppsBySlug: Map<string, AppConfig>,
@@ -170,6 +186,8 @@ function mergeDbAppConfig(
     name: dbApp.name || app.name,
     icon: dbApp.icon || app.icon,
     url: dbApp.url || app.url,
+    category: dbApp.category || app.category,
+    subcategory: dbApp.subcategory || app.subcategory,
   };
 }
 
@@ -528,7 +546,9 @@ export function getDevApps() {
     return devConfig.apps
       .filter(
         (app: DevIframeApp) =>
-          app.slug !== "pdf-toolkit" && app.slug !== "image-toolkit",
+          app.slug !== "pdf-toolkit" &&
+          app.slug !== "image-toolkit" &&
+          app.slug !== "loop",
       )
       .map((app: DevIframeApp) => ({
         name: getAppName(app.slug),

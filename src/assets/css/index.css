@@ -6,6 +6,46 @@ body {
 	font-family: "Inter", "Geist", sans-serif;
 }
 
+:root {
+	--lineos-accent: #2563eb;
+	--lineos-text: #0f172a;
+	--lineos-bg: #f8fafc;
+	--lineos-default-bg:
+		radial-gradient(circle at top left, rgba(37, 99, 235, 0.14), transparent 30%),
+		linear-gradient(135deg, #f8fafc 0%, #ffffff 48%, #e0f2fe 100%);
+	--lineos-windows-bg:
+		radial-gradient(circle at top, rgba(255, 255, 255, 0.85), transparent 28%),
+		linear-gradient(135deg, #bdeaff 0%, #2776d8 54%, #102a72 100%);
+	--lineos-ubuntu-bg:
+		radial-gradient(circle at 18% 20%, rgba(233, 84, 32, 0.7), transparent 28%),
+		linear-gradient(135deg, #2c001e 0%, #5e2750 48%, #111827 100%);
+}
+
+[data-lineos-theme="custom"] {
+	--lineos-default-bg: var(
+		--custom-lineos-bg,
+		linear-gradient(135deg, #f8fafc 0%, #ffffff 48%, #e0f2fe 100%)
+	);
+	--lineos-text: var(--custom-lineos-text, #0f172a);
+	--lineos-accent: var(--custom-lineos-accent, #14b8a6);
+}
+
+.lineos-shell {
+	background: var(--lineos-bg);
+}
+
+.lineos-shell-default {
+	background: var(--lineos-default-bg);
+}
+
+.lineos-shell-windows {
+	background: var(--lineos-windows-bg);
+}
+
+.lineos-shell-ubuntu {
+	background: var(--lineos-ubuntu-bg);
+}
+
 .w-app-screen {
 	width: calc(100vw - 65px);
 }
