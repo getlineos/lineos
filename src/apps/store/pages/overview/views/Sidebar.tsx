@@ -3,7 +3,6 @@ import { useGetProfileQuery } from "@/store/slices/profileApi";
 import { cn } from "@/utils";
 import type { ElementType } from "react";
 import {
-	Apple,
 	ChartNoAxesColumnIncreasing,
 	CircleCheckBig,
 	CopyCheck,
@@ -31,10 +30,7 @@ export default function Sidebar() {
 
 	return (
 		<aside className="flex w-72 shrink-0 flex-col border-r border-black/10 bg-white/65 backdrop-blur-2xl">
-			<Link to="/store" className="flex items-center gap-3 px-5 py-5">
-				<div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[#0071e3] text-white shadow-sm">
-					<Apple className="h-6 w-6 fill-current" />
-				</div>
+			<Link to="/store" className="flex items-center px-5 py-5">
 				<span className="text-lg font-semibold text-[#1d1d1f]">App Store</span>
 			</Link>
 

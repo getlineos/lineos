@@ -71,9 +71,9 @@ function DefaultAssistiveMenu() {
 			className: "bg-slate-950 text-white",
 		},
 		{
-			label: "Launcher",
+			label: "App Store",
 			icon: Grid3X3,
-			onClick: () => navigate("/launchpad"),
+			onClick: () => navigate("/store"),
 			className: "bg-white text-slate-950",
 		},
 		{
@@ -93,7 +93,7 @@ function DefaultAssistiveMenu() {
 	return (
 		<>
 			<div
-				className="fixed left-0 top-1/2 z-[1000] h-48 w-2.5 -translate-y-1/2"
+				className="fixed left-0 top-1/2 z-[1000] h-48 w-[25px] -translate-y-1/2"
 				aria-hidden="true"
 				onMouseEnter={() => setIsOpen(true)}
 			/>
